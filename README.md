@@ -1,16 +1,29 @@
-# turboquant-wasm
+<p align="center">
+  <img src="docs/assets/turboquant-wasm.png" alt="TurboQuant WASM" width="947">
+</p>
 
-Compress embedding vectors and search them in the browser, offline, or at the edge.
+<p align="center">
+  <strong>Training-free embedding compression and local vector search for browsers, offline apps, and edge runtimes.</strong>
+</p>
 
-`turboquant-wasm` is a Rust/WASM implementation of TurboQuant Algorithm 1. It is built for applications that already have embeddings and want local retrieval without shipping a vector database or a graph index.
+<p align="center">
+  <img src="benchmarks/charts/bundle-size-vs-alternatives.svg" alt="Bundle size vs alternative browser-side search libraries" width="860">
+</p>
 
-## Why use it
+<p align="center">
+  Opening comparison chart: the current <code>turboquant-wasm</code> package is about <code>31.1 KiB</code> gzip, while the alternative bars come from the comparison tables in <code>benchmarks/wasm_analysis.md</code>. This is positioning data, not a fresh controlled head-to-head benchmark suite.
+</p>
 
-- Compress embeddings aggressively. With `4-bit` quantization, a `384d` vector takes about `196 B` and a `768d` vector about `388 B`.
-- Search directly over compressed vectors. No full decode step on every query.
-- Persist indexes with `save()` and restore them with `Index.load()`.
-- Run in browsers, Node.js, and WASM-friendly edge runtimes.
-- Start from runnable examples instead of just a low-level API.
+`turboquant-wasm` is a Rust/WebAssembly implementation of TurboQuant Algorithm 1. It is built for applications that already have embeddings and want local retrieval without shipping a vector database or a graph index.
+
+## At a glance
+
+- Small web package. The current measured build is about `31.1 KiB` gzip.
+- Aggressive compression. With `4-bit` quantization, a `384d` vector takes about `196 B` and a `768d` vector about `388 B`.
+- Direct search on compressed vectors. No full decode step on every query.
+- Portable packaging. Runs in browsers, Node.js, and WASM-friendly edge runtimes.
+- Persistence built in. Save indexes with `save()` and restore them with `Index.load()`.
+- Example-first repo. Includes browser, WebGPU, and Cloudflare demos.
 
 ## Good fit
 
