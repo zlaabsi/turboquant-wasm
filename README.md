@@ -102,6 +102,7 @@ More detail: [examples/README.md](examples/README.md)
 Use these guides when you want an integration pattern instead of a toy demo:
 
 - [Browser Search](cookbook/browser-search.md)
+- [Browser Extension](cookbook/browser-extension.md)
 - [Client-Side RAG](cookbook/client-rag.md)
 - [Edge and Serverless](cookbook/edge-serverless.md)
 - [Desktop and Mobile](cookbook/desktop-mobile.md)

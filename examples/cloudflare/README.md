@@ -1,35 +1,33 @@
 # TurboQuant Cloudflare Worker
 
-Vector search at the edge using TurboQuant WASM. Indexes ~50 sentences with
-4-bit quantization and serves search queries via a simple HTTP API.
+This example shows the **deployment pattern**, not the best retrieval quality.
 
-## Prerequisites
+It runs TurboQuant inside a Cloudflare Worker and exposes a small `/search` HTTP API. The vectors are bag-of-words vectors built from a fixed in-worker corpus, so the point here is edge packaging and request flow, not semantic search relevance.
 
-- [Rust](https://rustup.rs/) and [wasm-pack](https://rustwasm.github.io/wasm-pack/installer/)
-- [Node.js](https://nodejs.org/) (v18+)
-- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/install-and-update/)
+## What it demonstrates
 
-## Setup
+- loading TurboQuant WASM in a Worker
+- building a tiny in-memory index once per worker instance
+- serving search results through a simple JSON API
+- keeping retrieval logic in the edge runtime with no external vector database
+
+## Run locally
+
+Prerequisites:
+
+- Rust + `wasm-pack`
+- Node.js 18+
+- Wrangler
+
+From the repo root:
 
 ```bash
-# Install wrangler (if not already installed)
-npm install -g wrangler
-
-# Build the WASM module (from turboquant-wasm root)
-cd ../..
-wasm-pack build --target web --out-dir pkg
-
-# Return to the example directory
+npm run build
 cd examples/cloudflare
-```
-
-## Local development
-
-```bash
 wrangler dev
 ```
 
-Open http://localhost:8787 for the search UI, or query directly:
+Open `http://localhost:8787/` or query the API directly:
 
 ```bash
 curl "http://localhost:8787/search?q=finding+similar+vectors"
@@ -38,42 +36,42 @@ curl "http://localhost:8787/search?q=finding+similar+vectors"
 ## Deploy
 
 ```bash
-wrangler login   # one-time auth
+cd examples/cloudflare
+wrangler login
 wrangler deploy
 ```
 
-## API
+## Runtime flow
 
-| Endpoint | Description |
-|---|---|
-| `GET /` | HTML search form |
-| `GET /search?q=...` | JSON search results (top 5) |
+1. The worker receives a request.
+2. `ensureIndex()` lazily initializes TurboQuant once per worker instance.
+3. The example builds a fixed bag-of-words index from the hardcoded corpus.
+4. `/search?q=...` maps the query to the same vector space and runs `index.search(...)`.
+5. The worker returns ids, text, matched words, and latency.
 
-### Example response
+## Where to edit first
 
-```json
-{
-  "query": "vector similarity",
-  "results": [
-    { "rank": 1, "index": 11, "text": "Cosine similarity measures the angle between two vectors", "score": 0.4472, "matched_words": ["similarity", "vectors"] },
-    { "rank": 2, "index": 2, "text": "Vector search finds similar items in a database", "score": 0.3162, "matched_words": ["vector"] }
-  ],
-  "search_ms": 0.12,
-  "n_vectors": 50,
-  "memory_bytes": 5200,
-  "vocabulary_size": 200,
-  "bits": 4
-}
-```
+- `CORPUS` if you want a different dataset
+- the fixed vocabulary if you want different lexical coverage
+- `DIM` if the vocabulary changes
+- `handleSearch()` if you want a different response schema
 
-## How it works
+## Recommended production path
 
-1. A fixed vocabulary of ~200 common words defines the embedding dimension.
-2. Each sentence is mapped to a bag-of-words vector (word counts, L2-normalized).
-3. Vectors are compressed with TurboQuant Algorithm 1 (4-bit, ~8x compression).
-4. At search time, the query is embedded the same way and searched against the
-   compressed index. All computation runs inside the Worker via WASM.
+Do **not** treat this exact demo as the final architecture for semantic search.
 
-Real applications would use neural embedding models (e.g., from the
-Sentence Transformers library) for much better semantic matching. This demo
-shows the TurboQuant WASM API running entirely at the edge.
+For a real edge service:
+
+- precompute embeddings offline
+- compress them ahead of time
+- load a saved TurboQuant index blob on cold start
+- keep metadata in KV, R2, D1, or another store outside the vector index
+- return ids and scores, then hydrate metadata separately
+
+That keeps the worker small and makes index updates explicit.
+
+## Why this example still matters
+
+Even with a toy vectorizer, it proves something useful: the retrieval layer itself can live comfortably inside a Worker and answer similarity queries without a dedicated vector service.
+
+For the broader deployment recipe, see [Edge and Serverless](../../cookbook/edge-serverless.md).
