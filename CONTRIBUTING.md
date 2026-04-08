@@ -46,6 +46,20 @@ Examples:
 - `fix: reject mismatched quantizers in search`
 - `docs: add edge deployment guide`
 
+## Release Flow
+
+The repository release tag is `v<version>`, for example `v0.1.0`.
+The npm package is published as `@zlaabsi/turboquant-wasm`.
+
+Normal release flow:
+
+1. Update `package.json` version.
+2. Run `npm run verify`.
+3. Push the release commit to `main`.
+4. Create and push the matching git tag.
+
+The release workflow will validate the tag, run checks, attach the tarball to the GitHub Release, and publish to npm when the `NPM_TOKEN` repository secret is present.
+
 ## Pull Request Expectations
 
 - Keep Rust changes covered by `wasm-bindgen` tests when behavior changes.

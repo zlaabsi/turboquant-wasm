@@ -6,7 +6,7 @@
  *
  * @example
  * ```ts
- * import { createQuantizer, buildIndex } from 'turboquant-wasm';
+ * import { createQuantizer, buildIndex } from '@zlaabsi/turboquant-wasm';
  *
  * const quantizer = await createQuantizer({ dim: 1536, bits: 4 });
  * const index = await quantizer.index(embeddings);

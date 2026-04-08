@@ -1,5 +1,5 @@
 {
-  "name": "turboquant-wasm",
+  "name": "@zlaabsi/turboquant-wasm",
   "version": "0.1.0",
   "description": "TurboQuant vector quantization for the browser — compress embeddings 8x, search client-side",
   "homepage": "https://github.com/zlaabsi/turboquant-wasm#readme",
@@ -63,6 +63,9 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/zlaabsi/turboquant-wasm"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "engines": {
     "node": ">=18"

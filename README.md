@@ -4,6 +4,8 @@ TurboQuant vector quantization for browser and edge runtimes.
 
 `turboquant-wasm` is a Rust-to-WASM implementation of TurboQuant Algorithm 1 for compressing embedding vectors and searching them client-side. It is designed for local-first search, browser-side RAG, and serverless edge deployments where you want to keep memory use low and avoid a vector database for moderate index sizes.
 
+The GitHub repository is `turboquant-wasm`. The npm package name is `@zlaabsi/turboquant-wasm`.
+
 ## Why This Repo Exists
 
 - Compress embeddings to roughly `dim * bits / 8 + 4` bytes per vector.
@@ -13,6 +15,12 @@ TurboQuant vector quantization for browser and edge runtimes.
 - Ship concrete examples instead of only an API surface.
 
 ## Quick Start
+
+### Install from npm
+
+```bash
+npm install @zlaabsi/turboquant-wasm
+```
 
 ### Build from source
 
@@ -30,7 +38,7 @@ Use `npm run build:node` when you want the Node.js bindings in `pkg-node/`.
 ### Minimal browser usage
 
 ```ts
-import { createQuantizer } from "turboquant-wasm";
+import { createQuantizer } from "@zlaabsi/turboquant-wasm";
 
 const quantizer = await createQuantizer({ dim: 384, bits: 4 });
 const index = quantizer.buildIndex(embeddings, nVectors);
@@ -40,7 +48,7 @@ const topK = index.search(queryEmbedding, 10);
 ### Persist and reload an index
 
 ```ts
-import { createQuantizer, Index } from "turboquant-wasm";
+import { createQuantizer, Index } from "@zlaabsi/turboquant-wasm";
 
 const quantizer = await createQuantizer({ dim: 384, bits: 4 });
 const index = quantizer.buildIndex(embeddings, nVectors);
@@ -118,6 +126,14 @@ make setup
 make verify
 make serve PORT=8080
 ```
+
+### Release
+
+1. Update `package.json` if you are cutting a new version.
+2. Run `npm run verify`.
+3. Push `main`.
+4. Create and push a matching tag such as `v0.1.0`.
+5. The `release` workflow publishes a GitHub Release and publishes to npm when `NPM_TOKEN` is configured.
 
 ### Run the examples locally
 
