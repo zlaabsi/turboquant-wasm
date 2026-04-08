@@ -42,24 +42,91 @@ Current `turboquant-wasm` bundle numbers below come from the latest measured sna
 
 ### Current measured package
 
-| File | Size |
-|---|---|
-| `turboquant_wasm_bg.wasm` | `63,943 bytes` (`62.4 KiB`) |
-| `turboquant_wasm.js` | `21,768 bytes` (`21.3 KiB`) |
-| **Total raw** | **`85,711 bytes` (`83.7 KiB`)** |
-| **`.wasm` gzip** | **`27,372 bytes` (`26.7 KiB`)** |
-| **`js` gzip** | **`4,466 bytes` (`4.4 KiB`)** |
-| **Total gzip** | **`31,838 bytes` (`31.1 KiB`)** |
+<table align="center">
+  <thead>
+    <tr>
+      <th>File</th>
+      <th>Size</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>turboquant_wasm_bg.wasm</code></td>
+      <td><code>63,943 bytes</code> (<code>62.4 KiB</code>)</td>
+    </tr>
+    <tr>
+      <td><code>turboquant_wasm.js</code></td>
+      <td><code>21,768 bytes</code> (<code>21.3 KiB</code>)</td>
+    </tr>
+    <tr>
+      <td><strong>Total raw</strong></td>
+      <td><strong><code>85,711 bytes</code> (<code>83.7 KiB</code>)</strong></td>
+    </tr>
+    <tr>
+      <td><strong><code>.wasm</code> gzip</strong></td>
+      <td><strong><code>27,372 bytes</code> (<code>26.7 KiB</code>)</strong></td>
+    </tr>
+    <tr>
+      <td><strong><code>js</code> gzip</strong></td>
+      <td><strong><code>4,466 bytes</code> (<code>4.4 KiB</code>)</strong></td>
+    </tr>
+    <tr>
+      <td><strong>Total gzip</strong></td>
+      <td><strong><code>31,838 bytes</code> (<code>31.1 KiB</code>)</strong></td>
+    </tr>
+  </tbody>
+</table>
 
 ### Comparison with alternative browser-side vector search libraries
 
-| Library | `.wasm` gzip | JS glue gzip | Total gzip | Notes |
-|---|---|---|---|---|
-| **turboquant-wasm** | **`26.7 KiB`** | **`4.4 KiB`** | **`31.1 KiB`** | Quantization-first, no graph index |
-| usearch-wasm | `~200 KiB` | `~15 KiB` | `~215 KiB` | HNSW + SIMD |
-| Voy | `~150 KiB` | `~20 KiB` | `~170 KiB` | Rust HNSW |
-| hnswlib-wasm | `~300 KiB` | `~25 KiB` | `~325 KiB` | C++ via Emscripten |
-| vectra | `0 KiB` | `~50 KiB` | `~50 KiB` | Pure JS brute-force |
+<table align="center">
+  <thead>
+    <tr>
+      <th>Library</th>
+      <th><code>.wasm</code> gzip</th>
+      <th>JS glue gzip</th>
+      <th>Total gzip</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>turboquant-wasm</strong></td>
+      <td><strong><code>26.7 KiB</code></strong></td>
+      <td><strong><code>4.4 KiB</code></strong></td>
+      <td><strong><code>31.1 KiB</code></strong></td>
+      <td>Quantization-first, no graph index</td>
+    </tr>
+    <tr>
+      <td>usearch-wasm</td>
+      <td><code>~200 KiB</code></td>
+      <td><code>~15 KiB</code></td>
+      <td><code>~215 KiB</code></td>
+      <td>HNSW + SIMD</td>
+    </tr>
+    <tr>
+      <td>Voy</td>
+      <td><code>~150 KiB</code></td>
+      <td><code>~20 KiB</code></td>
+      <td><code>~170 KiB</code></td>
+      <td>Rust HNSW</td>
+    </tr>
+    <tr>
+      <td>hnswlib-wasm</td>
+      <td><code>~300 KiB</code></td>
+      <td><code>~25 KiB</code></td>
+      <td><code>~325 KiB</code></td>
+      <td>C++ via Emscripten</td>
+    </tr>
+    <tr>
+      <td>vectra</td>
+      <td><code>0 KiB</code></td>
+      <td><code>~50 KiB</code></td>
+      <td><code>~50 KiB</code></td>
+      <td>Pure JS brute-force</td>
+    </tr>
+  </tbody>
+</table>
 
 `turboquant-wasm` is materially smaller than graph-based WASM alternatives. That matters most for edge deployments, mobile web, and embedded search widgets where bundle budget is tight.
 
@@ -74,33 +141,52 @@ Current `turboquant-wasm` bundle numbers below come from the latest measured sna
 
 This table keeps the product-level comparison from `benchmarks/wasm_analysis.md`, but refreshes the `turboquant-wasm` numbers to the current implementation.
 
-| Feature | turboquant-wasm | usearch-wasm | Voy | hnswlib-wasm |
-|---|---|---|---|---|
-| **Bundle size (gzip)** | `31.1 KiB` | `~215 KiB` | `~170 KiB` | `~325 KiB` |
-| **Training needed** | No | No, but graph build required | No, but graph build required | No, but graph build required |
-| **Quantization** | `1-8` bit scalar, paper-backed | `8-bit` scalar | None | None |
-| **Search algorithm** | Brute-force scan in rotated domain | HNSW graph | HNSW graph | HNSW graph |
-| **Search complexity** | `O(Nd)` | `O(log N * d)` | `O(log N * d)` | `O(log N * d)` |
-| **Memory per vector (`d=384`, `4-bit`)** | `196 B` | `1,536 B` | `1,536 B` | `1,536 B` |
-| **Memory per vector (`d=1536`, `4-bit`)** | `772 B` | `6,144 B` | `6,144 B` | `6,144 B` |
-| **Compression ratio** | `~8x` at packed `4-bit` | `1x` | `1x` | `1x` |
-| **Index build** | `O(N * d^2)` | `O(N * log N * d)` | `O(N * log N * d)` | `O(N * log N * d)` |
-| **Browser support** | All modern browsers with WASM | Browser WASM targets | Browser WASM targets | Browser WASM targets |
-| **Streaming add** | Yes | Yes | Yes | Yes |
-| **Theoretical guarantees** | MSE-optimal quantization from TurboQuant | None | None | None |
-| **Paper-backed approach** | Yes | No | No | No |
+<table align="center">
+  <thead>
+    <tr>
+      <th>Feature</th>
+      <th>turboquant-wasm</th>
+      <th>usearch-wasm</th>
+      <th>Voy</th>
+      <th>hnswlib-wasm</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Bundle size (gzip)</strong></td><td><code>31.1 KiB</code></td><td><code>~215 KiB</code></td><td><code>~170 KiB</code></td><td><code>~325 KiB</code></td></tr>
+    <tr><td><strong>Training needed</strong></td><td>No</td><td>No, but graph build required</td><td>No, but graph build required</td><td>No, but graph build required</td></tr>
+    <tr><td><strong>Quantization</strong></td><td><code>1-8</code> bit scalar, paper-backed</td><td><code>8-bit</code> scalar</td><td>None</td><td>None</td></tr>
+    <tr><td><strong>Search algorithm</strong></td><td>Brute-force scan in rotated domain</td><td>HNSW graph</td><td>HNSW graph</td><td>HNSW graph</td></tr>
+    <tr><td><strong>Search complexity</strong></td><td><code>O(Nd)</code></td><td><code>O(log N * d)</code></td><td><code>O(log N * d)</code></td><td><code>O(log N * d)</code></td></tr>
+    <tr><td><strong>Memory per vector (<code>d=384</code>, <code>4-bit</code>)</strong></td><td><code>196 B</code></td><td><code>1,536 B</code></td><td><code>1,536 B</code></td><td><code>1,536 B</code></td></tr>
+    <tr><td><strong>Memory per vector (<code>d=1536</code>, <code>4-bit</code>)</strong></td><td><code>772 B</code></td><td><code>6,144 B</code></td><td><code>6,144 B</code></td><td><code>6,144 B</code></td></tr>
+    <tr><td><strong>Compression ratio</strong></td><td><code>~8x</code> at packed <code>4-bit</code></td><td><code>1x</code></td><td><code>1x</code></td><td><code>1x</code></td></tr>
+    <tr><td><strong>Index build</strong></td><td><code>O(N * d^2)</code></td><td><code>O(N * log N * d)</code></td><td><code>O(N * log N * d)</code></td><td><code>O(N * log N * d)</code></td></tr>
+    <tr><td><strong>Browser support</strong></td><td>All modern browsers with WASM</td><td>Browser WASM targets</td><td>Browser WASM targets</td><td>Browser WASM targets</td></tr>
+    <tr><td><strong>Streaming add</strong></td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+    <tr><td><strong>Theoretical guarantees</strong></td><td>MSE-optimal quantization from TurboQuant</td><td>None</td><td>None</td><td>None</td></tr>
+    <tr><td><strong>Paper-backed approach</strong></td><td>Yes</td><td>No</td><td>No</td><td>No</td></tr>
+  </tbody>
+</table>
 
 ## Key Advantages Summary
 
-| Dimension | turboquant-wasm advantage |
-|---|---|
-| **Bundle size** | About `5.5x` to `10.5x` smaller than graph-based WASM alternatives in the comparison tables, while still smaller than `vectra` in total shipped bytes |
-| **Memory per vector** | About `8x` lower than raw float32 storage at packed `4-bit`, which matters directly in browser and edge memory budgets |
-| **API simplicity** | Build and search without graph parameters, `ef` tuning, connectivity tuning, or external quantization passes |
-| **Theoretical foundation** | Based on the TurboQuant paper rather than a purely heuristic compression layer |
-| **Edge compatibility** | Small enough to fit comfortably in edge/serverless WASM budgets, including Cloudflare Worker-style deployments |
-| **No training** | Centroids are fixed and quantizer creation is deterministic from the chosen seed |
-| **Determinism** | Same seed and same inputs produce the same rotation and the same compressed representation |
+<table align="center">
+  <thead>
+    <tr>
+      <th>Dimension</th>
+      <th>turboquant-wasm advantage</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Bundle size</strong></td><td>About <code>5.5x</code> to <code>10.5x</code> smaller than graph-based WASM alternatives in the comparison tables, while still smaller than <code>vectra</code> in total shipped bytes</td></tr>
+    <tr><td><strong>Memory per vector</strong></td><td>About <code>8x</code> lower than raw float32 storage at packed <code>4-bit</code>, which matters directly in browser and edge memory budgets</td></tr>
+    <tr><td><strong>API simplicity</strong></td><td>Build and search without graph parameters, <code>ef</code> tuning, connectivity tuning, or external quantization passes</td></tr>
+    <tr><td><strong>Theoretical foundation</strong></td><td>Based on the TurboQuant paper rather than a purely heuristic compression layer</td></tr>
+    <tr><td><strong>Edge compatibility</strong></td><td>Small enough to fit comfortably in edge/serverless WASM budgets, including Cloudflare Worker-style deployments</td></tr>
+    <tr><td><strong>No training</strong></td><td>Centroids are fixed and quantizer creation is deterministic from the chosen seed</td></tr>
+    <tr><td><strong>Determinism</strong></td><td>Same seed and same inputs produce the same rotation and the same compressed representation</td></tr>
+  </tbody>
+</table>
 
 ## Good fit
 
@@ -178,12 +264,21 @@ Then open:
 
 Example matrix:
 
-| Example | Stack | Best for |
-|---|---|---|
-| [browser](examples/browser/README.md) | Plain HTML + bag-of-words | Zero-dependency smoke test |
-| [transformers-js](examples/transformers-js/README.md) | Transformers.js + WebGPU | Fastest path to real semantic search in-browser |
-| [onnx-webgpu](examples/onnx-webgpu/README.md) | ONNX Runtime Web + WebGPU | More control over model and tokenizer |
-| [cloudflare](examples/cloudflare/README.md) | Cloudflare Worker | Edge search API pattern |
+<table align="center">
+  <thead>
+    <tr>
+      <th>Example</th>
+      <th>Stack</th>
+      <th>Best for</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td><a href="examples/browser/README.md">browser</a></td><td>Plain HTML + bag-of-words</td><td>Zero-dependency smoke test</td></tr>
+    <tr><td><a href="examples/transformers-js/README.md">transformers-js</a></td><td>Transformers.js + WebGPU</td><td>Fastest path to real semantic search in-browser</td></tr>
+    <tr><td><a href="examples/onnx-webgpu/README.md">onnx-webgpu</a></td><td>ONNX Runtime Web + WebGPU</td><td>More control over model and tokenizer</td></tr>
+    <tr><td><a href="examples/cloudflare/README.md">cloudflare</a></td><td>Cloudflare Worker</td><td>Edge search API pattern</td></tr>
+  </tbody>
+</table>
 
 More detail: [examples/README.md](examples/README.md)
 
@@ -215,22 +310,54 @@ That means the numbers below are **directional evidence**, not a universal SLA.
 
 ### Current snapshot
 
-| Scenario | Result |
-|---|---|
-| `d=384`, `4-bit`, `N=5000` | `82.4%` recall@10, `11.89 ms` median search in the clustered-query sweep, `196 B/vector` |
-| `d=768`, `4-bit`, `N=3000` | `81.5%` recall@10, `10.37 ms` median search, `388 B/vector` |
-| Sustained load at `N=5000` | `7.87 ms` p50, `10.07 ms` p95, `23.13 ms` p99, `112 q/s` |
-| Web package size | `83.7 KiB` raw, `31.1 KiB` gzip |
+<table align="center">
+  <thead>
+    <tr>
+      <th>Scenario</th>
+      <th>Result</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td><code>d=384</code>, <code>4-bit</code>, <code>N=5000</code></td><td><code>82.4%</code> recall@10, <code>11.89 ms</code> median search in the clustered-query sweep, <code>196 B/vector</code></td></tr>
+    <tr><td><code>d=768</code>, <code>4-bit</code>, <code>N=3000</code></td><td><code>81.5%</code> recall@10, <code>10.37 ms</code> median search, <code>388 B/vector</code></td></tr>
+    <tr><td>Sustained load at <code>N=5000</code></td><td><code>7.87 ms</code> p50, <code>10.07 ms</code> p95, <code>23.13 ms</code> p99, <code>112 q/s</code></td></tr>
+    <tr><td>Web package size</td><td><code>83.7 KiB</code> raw, <code>31.1 KiB</code> gzip</td></tr>
+  </tbody>
+</table>
 
 ### Charts
 
-![Recall vs bit-width](benchmarks/charts/recall-vs-bits.svg)
+<p align="center">
+  <img src="benchmarks/charts/recall-vs-bits.svg" alt="Recall vs bit-width" width="860">
+</p>
 
-![Search latency vs corpus size](benchmarks/charts/search-vs-corpus.svg)
+<p align="center">
+  <em>Recall@10 versus bit-width on clustered synthetic embeddings.</em>
+</p>
 
-![Tail latency under sustained load](benchmarks/charts/tail-latency-5k.svg)
+<p align="center">
+  <img src="benchmarks/charts/search-vs-corpus.svg" alt="Search latency vs corpus size" width="860">
+</p>
 
-![Bundle size](benchmarks/charts/bundle-size.svg)
+<p align="center">
+  <em>Search latency as corpus size grows for the 4-bit <code>d=384</code> configuration.</em>
+</p>
+
+<p align="center">
+  <img src="benchmarks/charts/tail-latency-5k.svg" alt="Tail latency under sustained load" width="860">
+</p>
+
+<p align="center">
+  <em>Tail latency under sustained load for the <code>5K</code>-vector, <code>4-bit</code> search benchmark.</em>
+</p>
+
+<p align="center">
+  <img src="benchmarks/charts/bundle-size.svg" alt="Bundle size" width="860">
+</p>
+
+<p align="center">
+  <em>Raw and gzip package sizes for the current generated web package.</em>
+</p>
 
 ### Raw benchmark data
 
@@ -246,11 +373,29 @@ Important caveat: these comparative plots are **not** a fresh controlled benchma
 
 Reading guide: purple is the current measured `turboquant-wasm` result, gray bars are the comparison points documented in `benchmarks/wasm_analysis.md`, and the small labels under the gray bars show the relative overhead versus TurboQuant.
 
-![Bundle size vs alternatives](benchmarks/charts/bundle-size-vs-alternatives.svg)
+<p align="center">
+  <img src="benchmarks/charts/bundle-size-vs-alternatives.svg" alt="Bundle size vs alternatives" width="860">
+</p>
 
-![Memory per vector at d=384](benchmarks/charts/memory-d384-vs-alternatives.svg)
+<p align="center">
+  <em>Current <code>turboquant-wasm</code> package size versus maintained browser-side comparison points.</em>
+</p>
 
-![Memory per vector at d=1536](benchmarks/charts/memory-d1536-vs-alternatives.svg)
+<p align="center">
+  <img src="benchmarks/charts/memory-d384-vs-alternatives.svg" alt="Memory per vector at d=384" width="860">
+</p>
+
+<p align="center">
+  <em>Packed TurboQuant memory per vector at <code>d=384</code> versus maintained comparison points.</em>
+</p>
+
+<p align="center">
+  <img src="benchmarks/charts/memory-d1536-vs-alternatives.svg" alt="Memory per vector at d=1536" width="860">
+</p>
+
+<p align="center">
+  <em>Packed TurboQuant memory per vector at <code>d=1536</code> versus maintained comparison points.</em>
+</p>
 
 ### What is still missing
 
