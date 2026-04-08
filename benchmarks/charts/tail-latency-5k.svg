@@ -40,20 +40,20 @@
   <line x1="70" y1="278" x2="836" y2="278" stroke="#94a3b8" stroke-width="1.5" />
   
       <rect x="169.66666666666669" y="243.372" width="56" height="34.628" rx="8" fill="#7c3aed" stroke="none" stroke-width="0" />
-      <text x="197.66666666666669" y="235.372" text-anchor="middle" class="value" fill="#0f172a">7.87 ms</text>
-      <text x="197.66666666666669" y="300" text-anchor="middle" class="label" fill="#0f172a">p50</text>
+      <text x="197.66666666666669" y="235.372" text-anchor="middle" class="value" style="fill: #0f172a;">7.87 ms</text>
+      <text x="197.66666666666669" y="300" text-anchor="middle" class="label" style="fill: #0f172a;">p50</text>
       
     
 
       <rect x="425.00000000000006" y="233.692" width="56" height="44.308" rx="8" fill="#7c3aed" stroke="none" stroke-width="0" />
-      <text x="453.00000000000006" y="225.692" text-anchor="middle" class="value" fill="#0f172a">10.07 ms</text>
-      <text x="453.00000000000006" y="300" text-anchor="middle" class="label" fill="#0f172a">p95</text>
+      <text x="453.00000000000006" y="225.692" text-anchor="middle" class="value" style="fill: #0f172a;">10.07 ms</text>
+      <text x="453.00000000000006" y="300" text-anchor="middle" class="label" style="fill: #0f172a;">p95</text>
       
     
 
       <rect x="680.3333333333334" y="176.228" width="56" height="101.77199999999999" rx="8" fill="#7c3aed" stroke="none" stroke-width="0" />
-      <text x="708.3333333333334" y="168.228" text-anchor="middle" class="value" fill="#0f172a">23.13 ms</text>
-      <text x="708.3333333333334" y="300" text-anchor="middle" class="label" fill="#0f172a">p99</text>
+      <text x="708.3333333333334" y="168.228" text-anchor="middle" class="value" style="fill: #0f172a;">23.13 ms</text>
+      <text x="708.3333333333334" y="300" text-anchor="middle" class="label" style="fill: #0f172a;">p99</text>
       
     
 </svg>

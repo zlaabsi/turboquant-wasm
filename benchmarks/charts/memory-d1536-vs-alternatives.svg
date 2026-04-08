@@ -40,26 +40,26 @@
   <line x1="70" y1="278" x2="836" y2="278" stroke="#94a3b8" stroke-width="1.5" />
   
       <rect x="137.75" y="261.016" width="56" height="16.984" rx="8" fill="#635bff" stroke="#4338ca" stroke-width="1.5" />
-      <text x="165.75" y="253.01600000000002" text-anchor="middle" class="value" fill="#4338ca">772 B</text>
-      <text x="165.75" y="300" text-anchor="middle" class="label" fill="#4338ca">turboquant</text>
-      <text x="165.75" y="316" text-anchor="middle" class="secondary" fill="#4338ca">current packed</text>
+      <text x="165.75" y="253.01600000000002" text-anchor="middle" class="value" style="fill: #4338ca;">772 B</text>
+      <text x="165.75" y="300" text-anchor="middle" class="label" style="fill: #4338ca;">turboquant</text>
+      <text x="165.75" y="316" text-anchor="middle" class="secondary" style="fill: #4338ca;">current packed</text>
     
 
       <rect x="329.25" y="142.83200000000002" width="56" height="135.16799999999998" rx="8" fill="#9aa7b6" stroke="none" stroke-width="0" />
-      <text x="357.25" y="134.83200000000002" text-anchor="middle" class="value" fill="#0f172a">6144 B</text>
-      <text x="357.25" y="300" text-anchor="middle" class="label" fill="#0f172a">usearch</text>
-      <text x="357.25" y="316" text-anchor="middle" class="secondary" fill="#64748b">8.0x more memory</text>
+      <text x="357.25" y="134.83200000000002" text-anchor="middle" class="value" style="fill: #0f172a;">6144 B</text>
+      <text x="357.25" y="300" text-anchor="middle" class="label" style="fill: #0f172a;">usearch</text>
+      <text x="357.25" y="316" text-anchor="middle" class="secondary" style="fill: #64748b;">8.0x more memory</text>
     
 
       <rect x="520.75" y="142.83200000000002" width="56" height="135.16799999999998" rx="8" fill="#9aa7b6" stroke="none" stroke-width="0" />
-      <text x="548.75" y="134.83200000000002" text-anchor="middle" class="value" fill="#0f172a">6144 B</text>
-      <text x="548.75" y="300" text-anchor="middle" class="label" fill="#0f172a">voy</text>
-      <text x="548.75" y="316" text-anchor="middle" class="secondary" fill="#64748b">8.0x more memory</text>
+      <text x="548.75" y="134.83200000000002" text-anchor="middle" class="value" style="fill: #0f172a;">6144 B</text>
+      <text x="548.75" y="300" text-anchor="middle" class="label" style="fill: #0f172a;">voy</text>
+      <text x="548.75" y="316" text-anchor="middle" class="secondary" style="fill: #64748b;">8.0x more memory</text>
     
 
       <rect x="712.25" y="142.83200000000002" width="56" height="135.16799999999998" rx="8" fill="#9aa7b6" stroke="none" stroke-width="0" />
-      <text x="740.25" y="134.83200000000002" text-anchor="middle" class="value" fill="#0f172a">6144 B</text>
-      <text x="740.25" y="300" text-anchor="middle" class="label" fill="#0f172a">hnswlib</text>
-      <text x="740.25" y="316" text-anchor="middle" class="secondary" fill="#64748b">8.0x more memory</text>
+      <text x="740.25" y="134.83200000000002" text-anchor="middle" class="value" style="fill: #0f172a;">6144 B</text>
+      <text x="740.25" y="300" text-anchor="middle" class="label" style="fill: #0f172a;">hnswlib</text>
+      <text x="740.25" y="316" text-anchor="middle" class="secondary" style="fill: #64748b;">8.0x more memory</text>
     
 </svg>

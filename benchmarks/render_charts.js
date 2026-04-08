@@ -74,9 +74,9 @@ function barChartSvg({
     const secondaryFill = item.secondaryFill ?? '#475569';
     return `
       <rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" rx="8" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}" />
-      <text x="${x + barWidth / 2}" y="${valueY}" text-anchor="middle" class="value" fill="${valueFill}">${escapeXml(valueFormatter(item.value, false))}</text>
-      <text x="${x + barWidth / 2}" y="${labelY}" text-anchor="middle" class="label" fill="${labelFill}">${escapeXml(item.label)}</text>
-      ${item.secondary ? `<text x="${x + barWidth / 2}" y="${secondaryY}" text-anchor="middle" class="secondary" fill="${secondaryFill}">${escapeXml(item.secondary)}</text>` : ''}
+      <text x="${x + barWidth / 2}" y="${valueY}" text-anchor="middle" class="value" style="fill: ${valueFill};">${escapeXml(valueFormatter(item.value, false))}</text>
+      <text x="${x + barWidth / 2}" y="${labelY}" text-anchor="middle" class="label" style="fill: ${labelFill};">${escapeXml(item.label)}</text>
+      ${item.secondary ? `<text x="${x + barWidth / 2}" y="${secondaryY}" text-anchor="middle" class="secondary" style="fill: ${secondaryFill};">${escapeXml(item.secondary)}</text>` : ''}
     `;
   }).join('\n');
 
