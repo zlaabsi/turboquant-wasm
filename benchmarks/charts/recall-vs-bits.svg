@@ -70,19 +70,19 @@
     
 
       <rect x="568.625" y="70.10000000000002" width="56" height="207.89999999999998" rx="8" fill="#0f766e" stroke="none" stroke-width="0" />
-      <text x="596.625" y="72" text-anchor="middle" class="value" fill="#0f172a">94.5%</text>
+      <text x="596.625" y="86.10000000000002" text-anchor="middle" class="value" fill="#ffffff">94.5%</text>
       <text x="596.625" y="300" text-anchor="middle" class="label" fill="#0f172a">6b</text>
       <text x="596.625" y="316" text-anchor="middle" class="secondary" fill="#475569">292 B/vec</text>
     
 
       <rect x="664.375" y="64.6" width="56" height="213.4" rx="8" fill="#0f766e" stroke="none" stroke-width="0" />
-      <text x="692.375" y="72" text-anchor="middle" class="value" fill="#0f172a">97.0%</text>
+      <text x="692.375" y="80.6" text-anchor="middle" class="value" fill="#ffffff">97.0%</text>
       <text x="692.375" y="300" text-anchor="middle" class="label" fill="#0f172a">7b</text>
       <text x="692.375" y="316" text-anchor="middle" class="secondary" fill="#475569">340 B/vec</text>
     
 
       <rect x="760.125" y="65.70000000000002" width="56" height="212.29999999999998" rx="8" fill="#0f766e" stroke="none" stroke-width="0" />
-      <text x="788.125" y="72" text-anchor="middle" class="value" fill="#0f172a">96.5%</text>
+      <text x="788.125" y="81.70000000000002" text-anchor="middle" class="value" fill="#ffffff">96.5%</text>
       <text x="788.125" y="300" text-anchor="middle" class="label" fill="#0f172a">8b</text>
       <text x="788.125" y="316" text-anchor="middle" class="secondary" fill="#475569">388 B/vec</text>
     

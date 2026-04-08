@@ -63,11 +63,13 @@ function barChartSvg({
     const y = margin.top + innerHeight - barHeight;
     const labelY = margin.top + innerHeight + 22;
     const secondaryY = labelY + 16;
-    const valueY = Math.max(margin.top + 14, y - 8);
+    const placeValueInsideBar = item.valuePosition === 'inside'
+      || (item.valuePosition !== 'outside' && y < margin.top + 22 && barHeight >= 28);
+    const valueY = placeValueInsideBar ? y + 16 : y - 8;
     const fill = item.fill ?? color;
     const stroke = item.stroke ?? 'none';
     const strokeWidth = item.strokeWidth ?? 0;
-    const valueFill = item.valueFill ?? '#0f172a';
+    const valueFill = item.valueFill ?? (placeValueInsideBar ? '#ffffff' : '#0f172a');
     const labelFill = item.labelFill ?? '#0f172a';
     const secondaryFill = item.secondaryFill ?? '#475569';
     return `
