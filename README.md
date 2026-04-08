@@ -14,7 +14,7 @@
   Fast read: the purple bar is the current <code>turboquant-wasm</code> build at about <code>31.1 KiB</code> gzip. Gray bars are maintained comparison estimates from <code>benchmarks/wasm_analysis.md</code>, and the small labels underneath show how much larger they are relative to TurboQuant. This is positioning context, not a committed side-by-side rerun against every alternative.
 </p>
 
-`turboquant-wasm` is a Rust/WebAssembly implementation of TurboQuant Algorithm 1. It is built for applications that already have embeddings and want local retrieval without shipping a vector database or a graph index.
+`turboquant-wasm` is a Rust/WebAssembly implementation of the TurboQuant MSE variant (Algorithm 1 from the paper). It is built for applications that already have embeddings and want local retrieval without shipping a vector database or a graph index.
 
 ## At a glance
 

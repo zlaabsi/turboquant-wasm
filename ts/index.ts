@@ -2,7 +2,7 @@
  * turboquant-wasm — TurboQuant vector quantization in the browser.
  *
  * High-level TypeScript API wrapping the Rust WASM core.
- * Implements Algorithm 1 (TurboQuant_mse) from arXiv:2504.19874.
+ * Implements the TurboQuant MSE variant (Algorithm 1 from arXiv:2504.19874).
  *
  * @example
  * ```ts

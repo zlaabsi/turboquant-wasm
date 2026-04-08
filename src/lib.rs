@@ -1,12 +1,12 @@
-//! TurboQuant WASM — Algorithm 1 (TurboQuant_mse) for browser-side vector search.
+//! TurboQuant WASM — the TurboQuant MSE variant (Algorithm 1) for browser-side vector search.
 //!
 //! Paper: "TurboQuant: Online Vector Quantization with Near-optimal Distortion Rate"
 //! Zandieh, Daliri, Hadian, Mirrokni — ICLR 2026 (arXiv:2504.19874)
 //!
-//! Implements Algorithm 1 only (MSE-optimal). QJL (Algorithm 2) is omitted for WASM
+//! Implements the TurboQuant MSE variant only. QJL (Algorithm 2) is omitted for WASM
 //! because the QJL projection matrix S ∈ R^{d×d} doubles the memory footprint, which
 //! is prohibitive in browser environments for d ≥ 768. For vector search at bits ≥ 3,
-//! Algorithm 1 alone gives excellent recall (the MSE bias is small).
+//! the MSE variant alone gives excellent recall (the MSE bias is small).
 //!
 //! KEY OPTIMIZATION — Search in the rotated domain:
 //!   Since Π is orthogonal, ⟨x, q⟩ = ⟨Πx, Πq⟩.
@@ -450,7 +450,7 @@ fn haar_orthogonal_matrix(dim: usize, seed: u64) -> Vec<f32> {
 }
 
 // ===========================================================================
-// TurboQuantizer — Algorithm 1 (TurboQuant_mse) exposed to WASM
+// TurboQuantizer — TurboQuant MSE variant (Algorithm 1) exposed to WASM
 // ===========================================================================
 
 #[wasm_bindgen]
@@ -472,7 +472,7 @@ pub struct TurboQuantizer {
 
 #[wasm_bindgen]
 impl TurboQuantizer {
-    /// Create a new TurboQuantizer (Algorithm 1).
+    /// Create a new TurboQuantizer for the TurboQuant MSE variant (Algorithm 1).
     ///
     /// - `dim`: embedding dimension (e.g. 384, 768, 1536)
     /// - `bits`: bits per coordinate (1–4, extendable to 8)
