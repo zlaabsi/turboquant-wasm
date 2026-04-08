@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TurboQuant WASM — Semantic Search Demo</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 760px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      color: #1a1a1a;
+      line-height: 1.5;
+    }
+    h1 { font-size: 1.4rem; margin-bottom: 0.25rem; }
+    .subtitle { color: #666; font-size: 0.9rem; margin-bottom: 1.5rem; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+    .stat {
+      background: #f5f5f5;
+      padding: 0.75rem;
+      border-radius: 6px;
+      text-align: center;
+    }
+    .stat-value { font-size: 1.3rem; font-weight: 700; color: #2563eb; }
+    .stat-label { font-size: 0.75rem; color: #666; margin-top: 0.15rem; }
+
+    label { font-weight: 600; font-size: 0.9rem; display: block; margin-bottom: 0.35rem; }
+    textarea {
+      width: 100%;
+      height: 260px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+    textarea:focus, input:focus { outline: 2px solid #2563eb; border-color: transparent; }
+
+    .search-row {
+      display: flex;
+      gap: 0.5rem;
+      margin: 1rem 0;
+    }
+    .search-row input {
+      flex: 1;
+      padding: 0.6rem 0.75rem;
+      font-size: 0.95rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 0.6rem 1.25rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    button:hover { background: #1d4ed8; }
+    button:disabled { background: #94a3b8; cursor: default; }
+
+    #results { margin-top: 1rem; }
+    .result-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid #eee;
+    }
+    .result-text { flex: 1; margin-right: 1rem; }
+    .result-rank { color: #999; font-size: 0.8rem; min-width: 1.5rem; margin-right: 0.5rem; }
+    .result-score {
+      color: #2563eb;
+      font-family: monospace;
+      font-size: 0.85rem;
+      white-space: nowrap;
+    }
+    .result-highlight { background: #dbeafe; padding: 0.1rem 0.3rem; border-radius: 3px; }
+
+    #log {
+      margin-top: 1.25rem;
+      font-family: monospace;
+      font-size: 0.8rem;
+      color: #888;
+      white-space: pre-wrap;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .note {
+      margin-top: 1.5rem;
+      padding: 0.75rem 1rem;
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      color: #92400e;
+    }
+  </style>
+</head>
+<body>
+  <h1>TurboQuant WASM Demo</h1>
+  <p class="subtitle">Client-side vector search with bag-of-words embeddings &mdash; no server, no model</p>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-value" id="nVectors">-</div><div class="stat-label">Vectors</div></div>
+    <div class="stat"><div class="stat-value" id="vocabSize">-</div><div class="stat-label">Vocab (dim)</div></div>
+    <div class="stat"><div class="stat-value" id="compression">-</div><div class="stat-label">Compression</div></div>
+    <div class="stat"><div class="stat-value" id="searchTime">-</div><div class="stat-label">Search (ms)</div></div>
+  </div>
+
+  <label for="corpus">Corpus (one sentence per line)</label>
+  <textarea id="corpus">The quick brown fox jumps over the lazy dog
+Machine learning models compress high-dimensional data
+Vector search finds similar items in a database
+Neural networks learn distributed representations
+The cat sat on the mat and looked out the window
+Approximate nearest neighbor search scales to billions
+Quantization reduces memory usage with minimal quality loss
+Embedding vectors capture semantic meaning of text
+The dog chased the ball across the green park
+Information retrieval ranks documents by relevance
+Transformers revolutionized natural language processing
+Cosine similarity measures the angle between two vectors
+The birds flew south for the winter migration
+Random rotation preserves inner products between vectors
+Compression algorithms trade accuracy for smaller storage
+The sun set behind the mountains painting the sky orange
+Search engines index billions of web pages for fast retrieval
+Orthogonal matrices preserve distances and angles perfectly
+The rain fell softly on the quiet village streets
+Dimensionality reduction projects data to lower dimensions</textarea>
+
+  <div class="search-row">
+    <input type="text" id="query" placeholder="Type a search query..." value="finding similar vectors quickly">
+    <button id="btnBuild" onclick="buildAndSearch()">Build Index</button>
+    <button id="btnSearch" onclick="runSearch()" disabled>Search</button>
+  </div>
+
+  <div id="results"></div>
+  <div id="log"></div>
+
+  <div class="note">
+    This demo uses bag-of-words (word frequency) vectors as embeddings.
+    Real applications use neural embedding models for much better semantic matching.
+    The point here is to demonstrate the TurboQuant WASM API running entirely client-side.
+  </div>
+
+  <script type="module">
+    import init, {
+      TurboQuantizer,
+      CompressedIndex,
+      build_index
+    } from '../../pkg/turboquant_wasm.js';
+
+    let quantizer = null;
+    let index = null;
+    let sentences = [];
+    let vocabulary = [];
+    let dim = 0;
+    const BITS = 4;
+
+    function log(msg) {
+      const el = document.getElementById('log');
+      el.textContent += msg + '\n';
+      el.scrollTop = el.scrollHeight;
+    }
+
+    function tokenize(text) {
+      return text.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(w => w.length > 0);
+    }
+
+    function buildVocabulary(docs) {
+      const wordSet = new Set();
+      for (const doc of docs) {
+        for (const word of tokenize(doc)) {
+          wordSet.add(word);
+        }
+      }
+      return Array.from(wordSet).sort();
+    }
+
+    function textToVector(text, vocab) {
+      const vec = new Float32Array(vocab.length);
+      const words = tokenize(text);
+      const wordIdx = new Map(vocab.map((w, i) => [w, i]));
+
+      for (const word of words) {
+        const idx = wordIdx.get(word);
+        if (idx !== undefined) {
+          vec[idx] += 1.0;
+        }
+      }
+
+      // L2-normalize
+      let norm = 0;
+      for (let i = 0; i < vec.length; i++) norm += vec[i] * vec[i];
+      norm = Math.sqrt(norm);
+      if (norm > 0) {
+        for (let i = 0; i < vec.length; i++) vec[i] /= norm;
+      }
+      return vec;
+    }
+
+    window.buildAndSearch = async function() {
+      const btnBuild = document.getElementById('btnBuild');
+      const btnSearch = document.getElementById('btnSearch');
+      btnBuild.disabled = true;
+      btnBuild.textContent = 'Loading...';
+      btnSearch.disabled = true;
+
+      try {
+        await init();
+        log('WASM module loaded');
+
+        // Parse corpus
+        const corpusText = document.getElementById('corpus').value;
+        sentences = corpusText.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+
+        if (sentences.length < 2) {
+          log('Error: need at least 2 sentences');
+          btnBuild.disabled = false;
+          btnBuild.textContent = 'Build Index';
+          return;
+        }
+
+        // Build vocabulary and embeddings
+        vocabulary = buildVocabulary(sentences);
+        dim = vocabulary.length;
+        log(`Vocabulary: ${dim} unique words from ${sentences.length} sentences`);
+
+        // Create quantizer
+        quantizer = new TurboQuantizer(dim, BITS, BigInt(42));
+        log(`Quantizer: dim=${dim}, bits=${BITS}, compression=${quantizer.compression_ratio.toFixed(1)}x, MSE=${quantizer.expected_mse.toFixed(4)}`);
+
+        // Build index using streaming API (one vector at a time)
+        const t0 = performance.now();
+        index = CompressedIndex.new_empty(dim, BITS);
+
+        for (let i = 0; i < sentences.length; i++) {
+          const vec = textToVector(sentences[i], vocabulary);
+          index.add_vector(quantizer, vec);
+        }
+        const buildTime = performance.now() - t0;
+
+        log(`Index built in ${buildTime.toFixed(1)}ms: ${index.n_vectors} vectors, ${index.memory_bytes} bytes (streaming API)`);
+
+        // Update stats
+        document.getElementById('nVectors').textContent = sentences.length;
+        document.getElementById('vocabSize').textContent = dim;
+        document.getElementById('compression').textContent = quantizer.compression_ratio.toFixed(1) + 'x';
+
+        btnBuild.textContent = 'Rebuild';
+        btnBuild.disabled = false;
+        btnSearch.disabled = false;
+
+        // Auto-search with current query
+        runSearch();
+      } catch (e) {
+        log('Error: ' + e.message);
+        btnBuild.textContent = 'Error';
+        console.error(e);
+      }
+    };
+
+    window.runSearch = function() {
+      if (!index || !quantizer || !vocabulary.length) return;
+
+      const queryText = document.getElementById('query').value.trim();
+      if (!queryText) return;
+
+      const queryVec = textToVector(queryText, vocabulary);
+
+      // Check if query has any overlap with vocabulary
+      const queryWords = tokenize(queryText);
+      const vocabSet = new Set(vocabulary);
+      const matched = queryWords.filter(w => vocabSet.has(w));
+      if (matched.length === 0) {
+        document.getElementById('results').innerHTML =
+          '<p style="color:#999; padding:1rem 0">No vocabulary overlap with corpus. Try words that appear in the sentences above.</p>';
+        return;
+      }
+
+      const k = Math.min(5, sentences.length);
+      const t0 = performance.now();
+      const topK = index.search(quantizer, queryVec, k);
+      const searchTime = performance.now() - t0;
+
+      document.getElementById('searchTime').textContent = searchTime.toFixed(2);
+
+      // Compute exact scores for display
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = '';
+
+      for (let rank = 0; rank < topK.length; rank++) {
+        const idx = topK[rank];
+        const sentVec = textToVector(sentences[idx], vocabulary);
+        let score = 0;
+        for (let j = 0; j < dim; j++) score += sentVec[j] * queryVec[j];
+
+        // Find matching words for highlighting
+        const sentWords = new Set(tokenize(sentences[idx]));
+        const matchedWords = matched.filter(w => sentWords.has(w));
+
+        let displayText = sentences[idx];
+        for (const word of matchedWords) {
+          const regex = new RegExp(`\\b(${word})\\b`, 'gi');
+          displayText = displayText.replace(regex, '<span class="result-highlight">$1</span>');
+        }
+
+        const item = document.createElement('div');
+        item.className = 'result-item';
+        item.innerHTML = `
+          <span class="result-rank">${rank + 1}.</span>
+          <span class="result-text">${displayText}</span>
+          <span class="result-score">${score.toFixed(4)}</span>
+        `;
+        resultsDiv.appendChild(item);
+      }
+
+      log(`Search "${queryText}" => top-1: #${topK[0]} (${searchTime.toFixed(2)}ms), matched: [${matched.join(', ')}]`);
+    };
+
+    // Search on Enter key
+    document.getElementById('query').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !document.getElementById('btnSearch').disabled) {
+        runSearch();
+      }
+    });
+  </script>
+</body>
+</html>

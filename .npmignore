@@ -1,0 +1,9 @@
+target/
+src/
+tests/
+examples/
+.cargo/
+.claude/
+Cargo.toml
+Cargo.lock
+pkg/.gitignore

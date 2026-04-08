@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TurboQuant + ONNX Runtime WebGPU — Semantic Search</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+      background: #0f1117;
+      color: #e2e4e9;
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #f0f1f3;
+      margin-bottom: 0.15rem;
+    }
+
+    .subtitle {
+      color: #7a7f8a;
+      font-size: 0.88rem;
+      margin-bottom: 1.25rem;
+    }
+
+    /* Status bar */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+      padding: 0.65rem 1rem;
+      background: #181a21;
+      border: 1px solid #2a2d38;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      color: #9a9fad;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .badge-webgpu { background: #1a3a2a; color: #4ade80; }
+    .badge-wasm  { background: #1a2a3a; color: #60a5fa; }
+    .badge-cpu   { background: #2a2520; color: #fbbf24; }
+    .badge-none  { background: #2a2020; color: #888; }
+
+    .badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    /* Stats grid */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.6rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .stat {
+      background: #181a21;
+      border: 1px solid #2a2d38;
+      padding: 0.7rem 0.5rem;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #60a5fa;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat-label {
+      font-size: 0.68rem;
+      color: #6b7080;
+      margin-top: 0.1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    /* Progress */
+    .progress-container {
+      margin-bottom: 1.5rem;
+      display: none;
+    }
+
+    .progress-container.visible { display: block; }
+
+    .progress-text {
+      font-size: 0.78rem;
+      color: #9a9fad;
+      margin-bottom: 0.35rem;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: #2a2d38;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: #60a5fa;
+      border-radius: 2px;
+      transition: width 0.3s ease;
+      width: 0%;
+    }
+
+    /* Corpus */
+    label {
+      font-weight: 600;
+      font-size: 0.85rem;
+      display: block;
+      margin-bottom: 0.3rem;
+      color: #c0c4cf;
+    }
+
+    textarea {
+      width: 100%;
+      height: 240px;
+      font-family: inherit;
+      font-size: 0.82rem;
+      padding: 0.75rem;
+      background: #181a21;
+      border: 1px solid #2a2d38;
+      border-radius: 8px;
+      color: #d0d3db;
+      resize: vertical;
+      line-height: 1.65;
+    }
+
+    textarea:focus, input[type="text"]:focus {
+      outline: none;
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.15);
+    }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      gap: 0.5rem;
+      margin: 1rem 0;
+      flex-wrap: wrap;
+    }
+
+    .controls input[type="text"] {
+      flex: 1;
+      min-width: 200px;
+      padding: 0.55rem 0.75rem;
+      font-size: 0.92rem;
+      background: #181a21;
+      border: 1px solid #2a2d38;
+      border-radius: 8px;
+      color: #e2e4e9;
+    }
+
+    button {
+      padding: 0.55rem 1.1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.88rem;
+      font-weight: 600;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+
+    .btn-primary { background: #2563eb; color: #fff; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-secondary { background: #2a2d38; color: #c0c4cf; }
+    .btn-secondary:hover { background: #353843; }
+    .btn-primary:disabled, .btn-secondary:disabled {
+      background: #1e2028;
+      color: #555;
+      cursor: default;
+    }
+
+    /* Latency breakdown */
+    .latency {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin: 0.75rem 0;
+      font-size: 0.75rem;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+    }
+
+    .latency-item {
+      padding: 0.25rem 0.55rem;
+      background: #181a21;
+      border: 1px solid #2a2d38;
+      border-radius: 4px;
+      color: #9a9fad;
+    }
+
+    .latency-item span { color: #60a5fa; font-weight: 600; }
+
+    /* Results */
+    #results { margin-top: 0.5rem; }
+
+    .result-item {
+      display: flex;
+      align-items: baseline;
+      padding: 0.65rem 0.75rem;
+      margin-bottom: 0.35rem;
+      background: #181a21;
+      border: 1px solid #2a2d38;
+      border-radius: 8px;
+      transition: border-color 0.15s;
+    }
+
+    .result-item:first-child { border-color: #2563eb44; }
+
+    .result-rank {
+      color: #555;
+      font-size: 0.78rem;
+      font-weight: 700;
+      min-width: 1.6rem;
+      flex-shrink: 0;
+    }
+
+    .result-text {
+      flex: 1;
+      font-size: 0.88rem;
+      margin-right: 0.75rem;
+      color: #d0d3db;
+    }
+
+    .result-highlight {
+      background: rgba(96, 165, 250, 0.15);
+      color: #93bbfc;
+      padding: 0.05rem 0.25rem;
+      border-radius: 3px;
+    }
+
+    .result-score {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.78rem;
+      color: #60a5fa;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* Log */
+    #log {
+      margin-top: 1.25rem;
+      padding: 0.75rem;
+      background: #13151b;
+      border: 1px solid #2a2d38;
+      border-radius: 8px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.72rem;
+      color: #6b7080;
+      white-space: pre-wrap;
+      max-height: 220px;
+      overflow-y: auto;
+      line-height: 1.7;
+    }
+
+    .log-ts { color: #444; }
+    .log-ok { color: #4ade80; }
+    .log-warn { color: #fbbf24; }
+    .log-err { color: #f87171; }
+
+    .note {
+      margin-top: 1.5rem;
+      padding: 0.75rem 1rem;
+      background: #1a1c24;
+      border: 1px solid #2a2d38;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      color: #6b7080;
+    }
+
+    .note a { color: #60a5fa; text-decoration: none; }
+    .note a:hover { text-decoration: underline; }
+
+    /* Persistence buttons */
+    .persistence-row {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    @media (max-width: 640px) {
+      .stats { grid-template-columns: repeat(3, 1fr); }
+      .controls { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>TurboQuant + ONNX Runtime Web</h1>
+  <p class="subtitle">Real semantic search in the browser &mdash; all-MiniLM-L6-v2 via WebGPU, compressed with TurboQuant WASM</p>
+
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span>ONNX Runtime <strong id="ortVersion">...</strong></span>
+    <span class="badge badge-none" id="epBadge">detecting</span>
+    <span id="modelStatus">Model: not loaded</span>
+    <span id="tqStatus">TurboQuant: not loaded</span>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat"><div class="stat-value" id="sVectors">-</div><div class="stat-label">Vectors</div></div>
+    <div class="stat"><div class="stat-value" id="sDim">384</div><div class="stat-label">Dimension</div></div>
+    <div class="stat"><div class="stat-value" id="sBits">4</div><div class="stat-label">Bits</div></div>
+    <div class="stat"><div class="stat-value" id="sCompress">-</div><div class="stat-label">Compression</div></div>
+    <div class="stat"><div class="stat-value" id="sMemory">-</div><div class="stat-label">Index KB</div></div>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-container" id="progressContainer">
+    <div class="progress-text" id="progressText">Loading...</div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+
+  <!-- Corpus -->
+  <label for="corpus">Corpus (one sentence per line)</label>
+  <textarea id="corpus">The quick brown fox jumps over the lazy dog
+Machine learning models compress high-dimensional data into compact representations
+Vector databases enable fast similarity search across millions of embeddings
+Neural networks learn hierarchical feature representations from raw data
+Transformers use self-attention to capture long-range dependencies in sequences
+Quantization reduces memory usage of embeddings with minimal accuracy loss
+Cosine similarity measures the angular distance between two vectors
+Random orthogonal rotations preserve inner products and distances
+The stock market experienced a sharp decline after the interest rate announcement
+Climate change is accelerating the melting of polar ice caps
+Photosynthesis converts sunlight into chemical energy in plant cells
+The James Webb Space Telescope captured unprecedented images of distant galaxies
+Reinforcement learning trains agents through trial-and-error interaction with environments
+Graph neural networks operate on non-Euclidean structured data
+Diffusion models generate images by learning to reverse a noise process
+The Mediterranean diet is associated with reduced cardiovascular disease risk
+Quantum computers exploit superposition and entanglement for parallel computation
+Large language models predict the next token given a sequence of text
+Contrastive learning aligns positive pairs and repels negative pairs in embedding space
+The Renaissance period marked a cultural rebirth in European art and science
+Convolutional neural networks detect spatial patterns through learned filters
+Approximate nearest neighbor algorithms trade exact results for faster retrieval
+The human genome contains approximately three billion base pairs of DNA
+Batch normalization stabilizes training by normalizing layer inputs
+WebAssembly runs compiled code at near-native speed inside the browser
+Gradient descent optimizes neural network weights by following the loss surface
+The Great Barrier Reef is the largest coral reef system in the world
+Attention mechanisms allow models to focus on relevant parts of the input
+Product quantization splits vectors into subspaces and quantizes each independently
+Electric vehicles are reducing transportation emissions in urban areas</textarea>
+
+  <!-- Search controls -->
+  <div class="controls">
+    <input type="text" id="query" placeholder="Type a semantic search query..." value="finding similar items quickly in a database">
+    <button class="btn-primary" id="btnInit" onclick="initAndBuild()">Load Model + Build</button>
+    <button class="btn-primary" id="btnSearch" onclick="doSearch()" disabled>Search</button>
+  </div>
+
+  <div class="persistence-row">
+    <button class="btn-secondary" id="btnSave" onclick="saveIndex()" disabled>Save to IndexedDB</button>
+    <button class="btn-secondary" id="btnLoad" onclick="loadIndex()" disabled>Load from IndexedDB</button>
+  </div>
+
+  <!-- Latency breakdown -->
+  <div class="latency" id="latencyBar" style="display:none">
+    <div class="latency-item">Tokenize: <span id="ltTok">-</span>ms</div>
+    <div class="latency-item">ONNX Inference: <span id="ltInf">-</span>ms</div>
+    <div class="latency-item">TQ Search: <span id="ltSearch">-</span>ms</div>
+    <div class="latency-item">Total: <span id="ltTotal">-</span>ms</div>
+  </div>
+
+  <!-- Results -->
+  <div id="results"></div>
+
+  <!-- Log -->
+  <div id="log"></div>
+
+  <!-- Note -->
+  <div class="note">
+    Model: <a href="https://huggingface.co/Xenova/all-MiniLM-L6-v2" target="_blank">Xenova/all-MiniLM-L6-v2</a> (quantized ONNX, ~31 MB).
+    Tokenizer vocabulary loaded from HuggingFace CDN.
+    Embeddings are 384-dimensional, compressed with TurboQuant Algorithm 1 at 4 bits/coordinate.
+    Serve with <code>python -m http.server</code> from the <code>turboquant-wasm</code> directory.
+  </div>
+</div>
+
+<!-- ONNX Runtime Web -->
+<script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.21.0/dist/ort.all.min.js"></script>
+
+<script type="module">
+// =========================================================================
+// Imports
+// =========================================================================
+import init, {
+  TurboQuantizer,
+  CompressedIndex,
+  build_index
+} from '../../pkg/turboquant_wasm.js';
+
+// =========================================================================
+// Constants
+// =========================================================================
+const MODEL_URL = 'https://huggingface.co/Xenova/all-MiniLM-L6-v2/resolve/main/onnx/model_quantized.onnx';
+const TOKENIZER_URL = 'https://huggingface.co/Xenova/all-MiniLM-L6-v2/resolve/main/tokenizer.json';
+const DIM = 384;
+const BITS = 4;
+const MAX_SEQ_LEN = 128;
+const IDB_NAME = 'turboquant-onnx-demo';
+const IDB_STORE = 'indices';
+const IDB_KEY = 'default';
+
+// =========================================================================
+// State
+// =========================================================================
+let onnxSession = null;
+let tokenizer = null;       // { vocab: Map<string,number>, unkId: number }
+let quantizer = null;
+let index = null;
+let sentences = [];
+let activeEP = 'none';
+
+// =========================================================================
+// Logging
+// =========================================================================
+function log(msg, cls = '') {
+  const el = document.getElementById('log');
+  const ts = new Date().toLocaleTimeString('en-GB', { hour12: false });
+  const span = `<span class="log-ts">[${ts}]</span> `;
+  if (cls) {
+    el.innerHTML += `${span}<span class="${cls}">${escHtml(msg)}</span>\n`;
+  } else {
+    el.innerHTML += `${span}${escHtml(msg)}\n`;
+  }
+  el.scrollTop = el.scrollHeight;
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function showProgress(text, pct) {
+  const c = document.getElementById('progressContainer');
+  c.classList.add('visible');
+  document.getElementById('progressText').textContent = text;
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+function hideProgress() {
+  document.getElementById('progressContainer').classList.remove('visible');
+}
+
+// =========================================================================
+// Minimal WordPiece Tokenizer
+// =========================================================================
+async function loadTokenizer() {
+  log('Fetching tokenizer.json from HuggingFace...');
+  showProgress('Downloading tokenizer...', 10);
+
+  const resp = await fetch(TOKENIZER_URL);
+  if (!resp.ok) throw new Error(`Failed to fetch tokenizer: ${resp.status}`);
+  const data = await resp.json();
+
+  // Build vocab map from the model's vocabulary
+  const vocab = new Map();
+  if (data.model && data.model.vocab) {
+    for (const [token, id] of Object.entries(data.model.vocab)) {
+      vocab.set(token, id);
+    }
+  }
+
+  const unkId = vocab.get('[UNK]') ?? 100;
+  const clsId = vocab.get('[CLS]') ?? 101;
+  const sepId = vocab.get('[SEP]') ?? 102;
+  const padId = vocab.get('[PAD]') ?? 0;
+
+  log(`Tokenizer loaded: ${vocab.size} tokens`, 'log-ok');
+  return { vocab, unkId, clsId, sepId, padId };
+}
+
+function tokenize(text) {
+  if (!tokenizer) throw new Error('Tokenizer not loaded');
+  const { vocab, unkId, clsId, sepId, padId } = tokenizer;
+
+  // Lowercase, strip accents, split on whitespace and punctuation
+  const cleaned = text.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // strip accents
+    .replace(/([^\w\s])/g, ' $1 ')   // separate punctuation
+    .trim();
+
+  const words = cleaned.split(/\s+/).filter(w => w.length > 0);
+  const ids = [clsId];
+
+  for (const word of words) {
+    // WordPiece: try to match longest prefix, then ##subwords
+    let remaining = word;
+    let isFirst = true;
+
+    while (remaining.length > 0) {
+      let matched = false;
+      for (let end = remaining.length; end > 0; end--) {
+        const sub = isFirst ? remaining.slice(0, end) : '##' + remaining.slice(0, end);
+        if (vocab.has(sub)) {
+          ids.push(vocab.get(sub));
+          remaining = remaining.slice(end);
+          isFirst = false;
+          matched = true;
+          break;
+        }
+      }
+      if (!matched) {
+        ids.push(unkId);
+        remaining = remaining.slice(1);
+        isFirst = false;
+      }
+    }
+
+    if (ids.length >= MAX_SEQ_LEN - 1) break;
+  }
+
+  ids.push(sepId);
+
+  // Truncate
+  const truncated = ids.slice(0, MAX_SEQ_LEN);
+  const seqLen = truncated.length;
+
+  // Pad
+  const inputIds = new BigInt64Array(MAX_SEQ_LEN);
+  const attentionMask = new BigInt64Array(MAX_SEQ_LEN);
+  const tokenTypeIds = new BigInt64Array(MAX_SEQ_LEN);
+
+  for (let i = 0; i < seqLen; i++) {
+    inputIds[i] = BigInt(truncated[i]);
+    attentionMask[i] = 1n;
+  }
+  for (let i = seqLen; i < MAX_SEQ_LEN; i++) {
+    inputIds[i] = BigInt(padId);
+    attentionMask[i] = 0n;
+    tokenTypeIds[i] = 0n;
+  }
+
+  return { inputIds, attentionMask, tokenTypeIds, seqLen };
+}
+
+// =========================================================================
+// ONNX Runtime Session
+// =========================================================================
+async function loadOnnxModel() {
+  // Detect ORT version
+  const ortVersion = ort.env?.versions?.web ?? ort.env?.versions ?? '?';
+  document.getElementById('ortVersion').textContent = typeof ortVersion === 'string' ? ortVersion : 'v1.21';
+
+  // Try execution providers in order
+  const providers = [];
+  let detectedEP = 'cpu';
+
+  // Check WebGPU availability
+  if (typeof navigator !== 'undefined' && navigator.gpu) {
+    try {
+      const adapter = await navigator.gpu.requestAdapter();
+      if (adapter) {
+        providers.push('webgpu');
+        detectedEP = 'webgpu';
+        log('WebGPU adapter found: ' + (adapter.info?.device || adapter.info?.description || 'unknown'), 'log-ok');
+      }
+    } catch (e) {
+      log('WebGPU probe failed: ' + e.message, 'log-warn');
+    }
+  }
+
+  providers.push('wasm');
+
+  log(`Creating ONNX session with providers: [${providers.join(', ')}]`);
+  showProgress('Downloading ONNX model (~31 MB)...', 20);
+
+  // Configure WASM paths for ORT
+  ort.env.wasm.wasmPaths = 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.21.0/dist/';
+
+  let session = null;
+  let usedEP = 'wasm';
+
+  // Try with WebGPU first, fall back
+  for (const ep of providers) {
+    try {
+      log(`Trying execution provider: ${ep}`);
+      session = await ort.InferenceSession.create(MODEL_URL, {
+        executionProviders: [ep],
+      });
+      usedEP = ep;
+      log(`Session created with EP: ${ep}`, 'log-ok');
+      break;
+    } catch (e) {
+      log(`EP "${ep}" failed: ${e.message}`, 'log-warn');
+      session = null;
+    }
+  }
+
+  if (!session) {
+    throw new Error('Failed to create ONNX session with any execution provider');
+  }
+
+  activeEP = usedEP;
+  updateEPBadge(usedEP);
+  document.getElementById('modelStatus').textContent = 'Model: loaded';
+
+  return session;
+}
+
+function updateEPBadge(ep) {
+  const badge = document.getElementById('epBadge');
+  badge.className = 'badge';
+  if (ep === 'webgpu') {
+    badge.classList.add('badge-webgpu');
+    badge.textContent = 'WebGPU';
+  } else if (ep === 'wasm') {
+    badge.classList.add('badge-wasm');
+    badge.textContent = 'WASM EP';
+  } else {
+    badge.classList.add('badge-cpu');
+    badge.textContent = 'CPU';
+  }
+}
+
+// =========================================================================
+// Embedding Extraction
+// =========================================================================
+async function embed(text) {
+  const t0 = performance.now();
+  const { inputIds, attentionMask, tokenTypeIds, seqLen } = tokenize(text);
+  const tTok = performance.now() - t0;
+
+  const t1 = performance.now();
+  const feeds = {
+    input_ids: new ort.Tensor('int64', inputIds, [1, MAX_SEQ_LEN]),
+    attention_mask: new ort.Tensor('int64', attentionMask, [1, MAX_SEQ_LEN]),
+    token_type_ids: new ort.Tensor('int64', tokenTypeIds, [1, MAX_SEQ_LEN]),
+  };
+
+  const output = await onnxSession.run(feeds);
+  const tInf = performance.now() - t1;
+
+  // Mean pooling: average over non-padding tokens from last_hidden_state
+  const hidden = output.last_hidden_state ?? output[Object.keys(output)[0]];
+  const hiddenData = hidden.data; // Float32Array of shape [1, seqLen, 384]
+
+  const embedding = new Float32Array(DIM);
+  for (let t = 0; t < seqLen; t++) {
+    const offset = t * DIM;
+    for (let d = 0; d < DIM; d++) {
+      embedding[d] += hiddenData[offset + d];
+    }
+  }
+
+  // Divide by actual token count and L2-normalize
+  for (let d = 0; d < DIM; d++) embedding[d] /= seqLen;
+  let norm = 0;
+  for (let d = 0; d < DIM; d++) norm += embedding[d] * embedding[d];
+  norm = Math.sqrt(norm);
+  if (norm > 0) {
+    for (let d = 0; d < DIM; d++) embedding[d] /= norm;
+  }
+
+  return { embedding, tTok, tInf };
+}
+
+async function embedBatch(texts) {
+  const embeddings = new Float32Array(texts.length * DIM);
+  let totalTok = 0, totalInf = 0;
+
+  for (let i = 0; i < texts.length; i++) {
+    const { embedding, tTok, tInf } = await embed(texts[i]);
+    embeddings.set(embedding, i * DIM);
+    totalTok += tTok;
+    totalInf += tInf;
+
+    if (i % 5 === 0) {
+      const pct = 40 + Math.round((i / texts.length) * 50);
+      showProgress(`Embedding ${i + 1}/${texts.length}...`, pct);
+    }
+  }
+
+  return { embeddings, totalTok, totalInf };
+}
+
+// =========================================================================
+// Build / Search / Persistence
+// =========================================================================
+window.initAndBuild = async function() {
+  const btn = document.getElementById('btnInit');
+  btn.disabled = true;
+  btn.textContent = 'Loading...';
+  document.getElementById('btnSearch').disabled = true;
+  document.getElementById('btnSave').disabled = true;
+  document.getElementById('btnLoad').disabled = true;
+
+  try {
+    // 1. Load TurboQuant WASM
+    showProgress('Loading TurboQuant WASM...', 5);
+    await init();
+    quantizer = new TurboQuantizer(DIM, BITS, 42n);
+    document.getElementById('tqStatus').textContent = 'TurboQuant: ready';
+    log(`TurboQuant loaded: dim=${DIM}, bits=${BITS}, compression=${quantizer.compression_ratio.toFixed(1)}x`, 'log-ok');
+
+    // 2. Load tokenizer
+    tokenizer = await loadTokenizer();
+    showProgress('Tokenizer loaded', 15);
+
+    // 3. Load ONNX model
+    onnxSession = await loadOnnxModel();
+    showProgress('Model loaded, embedding corpus...', 35);
+
+    // 4. Parse corpus
+    const corpusText = document.getElementById('corpus').value;
+    sentences = corpusText.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+    log(`Corpus: ${sentences.length} sentences`);
+
+    // 5. Embed all sentences
+    const { embeddings, totalTok, totalInf } = await embedBatch(sentences);
+    log(`Embedding done: tokenize=${totalTok.toFixed(0)}ms, inference=${totalInf.toFixed(0)}ms`);
+
+    // 6. Build TurboQuant index
+    showProgress('Building TurboQuant index...', 92);
+    const t0 = performance.now();
+    index = build_index(quantizer, embeddings, sentences.length);
+    const buildTime = performance.now() - t0;
+    log(`Index built in ${buildTime.toFixed(1)}ms: ${index.n_vectors} vectors, ${index.memory_bytes} bytes`, 'log-ok');
+
+    // Update stats
+    document.getElementById('sVectors').textContent = sentences.length;
+    document.getElementById('sCompress').textContent = quantizer.compression_ratio.toFixed(1) + 'x';
+    document.getElementById('sMemory').textContent = (index.memory_bytes / 1024).toFixed(1);
+
+    hideProgress();
+    btn.textContent = 'Reload Model + Rebuild';
+    btn.disabled = false;
+    document.getElementById('btnSearch').disabled = false;
+    document.getElementById('btnSave').disabled = false;
+    document.getElementById('btnLoad').disabled = false;
+
+    // Auto-search
+    doSearch();
+  } catch (e) {
+    log('Error: ' + e.message, 'log-err');
+    console.error(e);
+    hideProgress();
+    btn.textContent = 'Retry';
+    btn.disabled = false;
+  }
+};
+
+window.doSearch = async function() {
+  if (!onnxSession || !index || !quantizer) return;
+
+  const queryText = document.getElementById('query').value.trim();
+  if (!queryText) return;
+
+  const btnSearch = document.getElementById('btnSearch');
+  btnSearch.disabled = true;
+
+  try {
+    // Embed query
+    const { embedding: queryEmb, tTok, tInf } = await embed(queryText);
+
+    // TurboQuant search
+    const tS0 = performance.now();
+    const k = Math.min(10, sentences.length);
+    const topK = index.search(quantizer, queryEmb, k);
+    const tSearch = performance.now() - tS0;
+
+    const tTotal = tTok + tInf + tSearch;
+
+    // Latency display
+    document.getElementById('latencyBar').style.display = 'flex';
+    document.getElementById('ltTok').textContent = tTok.toFixed(1);
+    document.getElementById('ltInf').textContent = tInf.toFixed(1);
+    document.getElementById('ltSearch').textContent = tSearch.toFixed(2);
+    document.getElementById('ltTotal').textContent = tTotal.toFixed(1);
+
+    // Render results
+    const resultsDiv = document.getElementById('results');
+    resultsDiv.innerHTML = '';
+
+    // Compute exact cosine scores for display
+    const queryWords = new Set(
+      queryText.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/)
+    );
+
+    for (let rank = 0; rank < topK.length; rank++) {
+      const idx = topK[rank];
+      const sentence = sentences[idx];
+
+      // Highlight words that appear in the query
+      let display = escHtml(sentence);
+      for (const qw of queryWords) {
+        if (qw.length < 3) continue;
+        const re = new RegExp(`\\b(${qw})`, 'gi');
+        display = display.replace(re, '<span class="result-highlight">$1</span>');
+      }
+
+      const item = document.createElement('div');
+      item.className = 'result-item';
+      item.innerHTML = `
+        <span class="result-rank">${rank + 1}.</span>
+        <span class="result-text">${display}</span>
+        <span class="result-score">#${idx}</span>
+      `;
+      resultsDiv.appendChild(item);
+    }
+
+    log(`Search "${queryText}" => top-1: #${topK[0]} | tok=${tTok.toFixed(1)}ms inf=${tInf.toFixed(1)}ms tq=${tSearch.toFixed(2)}ms`);
+  } catch (e) {
+    log('Search error: ' + e.message, 'log-err');
+    console.error(e);
+  } finally {
+    btnSearch.disabled = false;
+  }
+};
+
+// =========================================================================
+// IndexedDB Persistence
+// =========================================================================
+function openIDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(IDB_NAME, 1);
+    req.onupgradeneeded = () => {
+      req.result.createObjectStore(IDB_STORE);
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+window.saveIndex = async function() {
+  if (!index) return;
+  try {
+    const blob = index.save();
+    const db = await openIDB();
+    const tx = db.transaction(IDB_STORE, 'readwrite');
+    const store = tx.objectStore(IDB_STORE);
+    // Save both the index blob and the sentences
+    store.put({ blob: blob, sentences: sentences }, IDB_KEY);
+    await new Promise((resolve, reject) => {
+      tx.oncomplete = resolve;
+      tx.onerror = () => reject(tx.error);
+    });
+    db.close();
+    log(`Index saved to IndexedDB: ${blob.byteLength} bytes + ${sentences.length} sentences`, 'log-ok');
+  } catch (e) {
+    log('Save error: ' + e.message, 'log-err');
+  }
+};
+
+window.loadIndex = async function() {
+  try {
+    const db = await openIDB();
+    const tx = db.transaction(IDB_STORE, 'readonly');
+    const store = tx.objectStore(IDB_STORE);
+    const req = store.get(IDB_KEY);
+    const result = await new Promise((resolve, reject) => {
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+    db.close();
+
+    if (!result) {
+      log('No saved index found in IndexedDB', 'log-warn');
+      return;
+    }
+
+    // Need TurboQuant loaded
+    if (!quantizer) {
+      await init();
+      quantizer = new TurboQuantizer(DIM, BITS, 42n);
+      document.getElementById('tqStatus').textContent = 'TurboQuant: ready';
+    }
+
+    index = CompressedIndex.load(new Uint8Array(result.blob));
+    sentences = result.sentences;
+
+    // Update corpus textarea
+    document.getElementById('corpus').value = sentences.join('\n');
+
+    // Update stats
+    document.getElementById('sVectors').textContent = index.n_vectors;
+    document.getElementById('sCompress').textContent = quantizer.compression_ratio.toFixed(1) + 'x';
+    document.getElementById('sMemory').textContent = (index.memory_bytes / 1024).toFixed(1);
+
+    log(`Index loaded from IndexedDB: ${index.n_vectors} vectors, ${index.memory_bytes} bytes`, 'log-ok');
+
+    // Enable search if we also have a model, or just load the model
+    if (onnxSession) {
+      document.getElementById('btnSearch').disabled = false;
+    } else {
+      log('Model not loaded yet. Click "Load Model + Build" or load the model separately.', 'log-warn');
+    }
+    document.getElementById('btnSave').disabled = false;
+  } catch (e) {
+    log('Load error: ' + e.message, 'log-err');
+  }
+};
+
+// Search on Enter
+document.getElementById('query').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !document.getElementById('btnSearch').disabled) {
+    doSearch();
+  }
+});
+
+// On page load, show ORT version
+try {
+  const v = ort?.env?.versions?.web ?? '1.21.0';
+  document.getElementById('ortVersion').textContent = typeof v === 'string' ? v : 'v1.21';
+} catch (_) {}
+</script>
+</body>
+</html>

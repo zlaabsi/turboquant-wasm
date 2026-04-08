@@ -1,0 +1,6 @@
+name = "turboquant-search"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+[build]
+command = "cd ../.. && wasm-pack build --target web --out-dir pkg"
