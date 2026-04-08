@@ -2,7 +2,7 @@
 
 Compress embedding vectors and search them in the browser, offline, or at the edge.
 
-`@zlaabsi/turboquant-wasm` is a Rust/WASM implementation of TurboQuant Algorithm 1. It is built for applications that already have embeddings and want local retrieval without shipping a vector database or a graph index.
+`turboquant-wasm` is a Rust/WASM implementation of TurboQuant Algorithm 1. It is built for applications that already have embeddings and want local retrieval without shipping a vector database or a graph index.
 
 ## Why use it
 
@@ -156,8 +156,8 @@ That means the numbers below are **directional evidence**, not a universal SLA.
 
 ## API and package notes
 
-- Package name: `@zlaabsi/turboquant-wasm`
-- Repository: `zlaabsi/turboquant-wasm`
+- Install from npm with `@zlaabsi/turboquant-wasm`
+- Repository: `github.com/zlaabsi/turboquant-wasm`
 - Primary workflow: create quantizer -> build or stream index -> save/load -> search
 - Generated artifacts live in `pkg/` and `pkg-node/`
 
