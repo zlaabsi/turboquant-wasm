@@ -17,6 +17,8 @@
  */
 
 const path = require('path');
+const fs = require('fs');
+const zlib = require('zlib');
 
 // ---------------------------------------------------------------------------
 // Realistic embedding generators
@@ -128,6 +130,26 @@ function percentile(arr, p) {
   const sorted = [...arr].sort((a, b) => a - b);
   const idx = Math.ceil(p / 100 * sorted.length) - 1;
   return sorted[Math.max(0, idx)];
+}
+
+function formatBytes(bytes) {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function measureBundleSizes() {
+  const wasmPath = path.join(__dirname, '..', 'pkg', 'turboquant_wasm_bg.wasm');
+  const jsPath = path.join(__dirname, '..', 'pkg', 'turboquant_wasm.js');
+  const wasmRaw = fs.statSync(wasmPath).size;
+  const jsRaw = fs.statSync(jsPath).size;
+  const wasmGzip = zlib.gzipSync(fs.readFileSync(wasmPath), { level: 9 }).length;
+  const jsGzip = zlib.gzipSync(fs.readFileSync(jsPath), { level: 9 }).length;
+
+  return {
+    totalRaw: wasmRaw + jsRaw,
+    totalGzip: wasmGzip + jsGzip,
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -517,7 +539,12 @@ async function main() {
   console.log(`  MPNet search recall@10 (d=768, 4-bit):     ${(recall768 * 100).toFixed(1)}%`);
   console.log(`  Edge cases:                                all passed`);
   console.log(`  Sustained load (200 queries):              ${Math.round(nLoadQueries / totalTime * 1000)} q/s`);
-  console.log(`  Bundle size:                               54KB (24KB gzip)`);
+  try {
+    const bundle = measureBundleSizes();
+    console.log(`  Bundle size (exact):                       ${formatBytes(bundle.totalRaw)} raw / ${formatBytes(bundle.totalGzip)} gzip`);
+  } catch (err) {
+    console.log(`  Bundle size (exact):                       unavailable (${err.message})`);
+  }
   console.log();
 }
 

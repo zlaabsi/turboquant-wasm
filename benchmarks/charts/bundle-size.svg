@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="360" viewBox="0 0 860 360" role="img" aria-label="Bundle size">
+  <style>
+    .title { font: 700 20px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #0f172a; }
+    .subtitle { font: 400 12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #475569; }
+    .label { font: 600 12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #0f172a; }
+    .secondary { font: 400 11px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #475569; }
+    .tick { font: 400 11px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #64748b; }
+    .value { font: 700 11px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #0f172a; }
+    .axis { font: 600 12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #334155; }
+  </style>
+  <rect width="100%" height="100%" fill="#ffffff" />
+  <text x="70" y="28" class="title">Bundle size</text>
+  <text x="70" y="46" class="subtitle">Measured on the generated web package with gzip -9</text>
+  <text x="18" y="168" transform="rotate(-90, 18, 168)" class="axis">Size (KiB)</text>
+  
+      <line x1="70" y1="278" x2="836" y2="278" stroke="#e5e7eb" stroke-width="1" />
+      <text x="60" y="282" text-anchor="end" class="tick">0</text>
+    
+
+      <line x1="70" y1="234" x2="836" y2="234" stroke="#e5e7eb" stroke-width="1" />
+      <text x="60" y="238" text-anchor="end" class="tick">20</text>
+    
+
+      <line x1="70" y1="190" x2="836" y2="190" stroke="#e5e7eb" stroke-width="1" />
+      <text x="60" y="194" text-anchor="end" class="tick">40</text>
+    
+
+      <line x1="70" y1="146" x2="836" y2="146" stroke="#e5e7eb" stroke-width="1" />
+      <text x="60" y="150" text-anchor="end" class="tick">60</text>
+    
+
+      <line x1="70" y1="102" x2="836" y2="102" stroke="#e5e7eb" stroke-width="1" />
+      <text x="60" y="106" text-anchor="end" class="tick">80</text>
+    
+
+      <line x1="70" y1="58" x2="836" y2="58" stroke="#e5e7eb" stroke-width="1" />
+      <text x="60" y="62" text-anchor="end" class="tick">100</text>
+    
+  <line x1="70" y1="278" x2="836" y2="278" stroke="#94a3b8" stroke-width="1.5" />
+  
+      <rect x="105.83333333333334" y="140.62246093750002" width="56" height="137.37753906249998" rx="8" fill="#b45309" />
+      <text x="133.83333333333334" y="132.62246093750002" text-anchor="middle" class="value">62.4 KiB</text>
+      <text x="133.83333333333334" y="300" text-anchor="middle" class="label">wasm raw</text>
+      
+    
+
+      <rect x="233.50000000000003" y="219.19296874999998" width="56" height="58.80703125000001" rx="8" fill="#b45309" />
+      <text x="261.5" y="211.19296874999998" text-anchor="middle" class="value">26.7 KiB</text>
+      <text x="261.5" y="300" text-anchor="middle" class="label">wasm gzip</text>
+      
+    
+
+      <rect x="361.1666666666667" y="231.2328125" width="56" height="46.7671875" rx="8" fill="#b45309" />
+      <text x="389.1666666666667" y="223.2328125" text-anchor="middle" class="value">21.3 KiB</text>
+      <text x="389.1666666666667" y="300" text-anchor="middle" class="label">js raw</text>
+      
+    
+
+      <rect x="488.8333333333333" y="268.405078125" width="56" height="9.594921874999999" rx="8" fill="#b45309" />
+      <text x="516.8333333333333" y="260.405078125" text-anchor="middle" class="value">4.4 KiB</text>
+      <text x="516.8333333333333" y="300" text-anchor="middle" class="label">js gzip</text>
+      
+    
+
+      <rect x="616.5000000000001" y="93.85527343749999" width="56" height="184.1447265625" rx="8" fill="#b45309" />
+      <text x="644.5000000000001" y="85.85527343749999" text-anchor="middle" class="value">83.7 KiB</text>
+      <text x="644.5000000000001" y="300" text-anchor="middle" class="label">total raw</text>
+      
+    
+
+      <rect x="744.1666666666667" y="209.598046875" width="56" height="68.401953125" rx="8" fill="#b45309" />
+      <text x="772.1666666666667" y="201.598046875" text-anchor="middle" class="value">31.1 KiB</text>
+      <text x="772.1666666666667" y="300" text-anchor="middle" class="label">total gzip</text>
+      
+    
+</svg>

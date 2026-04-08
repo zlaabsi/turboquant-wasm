@@ -46,7 +46,8 @@
     "test": "wasm-pack test --node",
     "verify": "npm run check && npm run test && npm pack --dry-run",
     "bench": "node benchmarks/node_bench.js",
-    "bench:realworld": "node benchmarks/realworld_test.js"
+    "bench:realworld": "node benchmarks/realworld_test.js",
+    "bench:charts": "node benchmarks/render_charts.js"
   },
   "keywords": [
     "turboquant",

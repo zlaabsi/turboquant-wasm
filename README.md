@@ -105,6 +105,37 @@ Use-case guides live in [cookbook/README.md](cookbook/README.md).
 - IDE code search over precomputed code embeddings.
 - Mobile delivery where compressed vectors reduce transfer size before client-side search.
 
+## Performance Snapshot
+
+This project is useful enough to demonstrate concrete browser and edge use cases, but it is **not benchmarked enough yet to claim universal superiority or production readiness on every target**.
+
+Current evidence is a single-machine local snapshot on `Apple M1 Max`, `Node v22.11.0`, `npm 10.9.0`, and `Darwin 25.3.0 arm64`, using synthetic clustered embeddings. What is still missing:
+
+- repeated runs with variance reporting for every metric
+- a lower-variance harness for build and search sweeps
+- browser benchmarks across low-end and mid-range devices
+- public real-world embedding corpora
+- head-to-head comparisons against exact float32 search and graph-based libraries
+
+The current source of truth is the structured snapshot in [benchmarks/results/2026-04-08-m1-max-node22.json](benchmarks/results/2026-04-08-m1-max-node22.json) plus the raw console log in [benchmarks/results/2026-04-08-m1-max-node22-realworld.txt](benchmarks/results/2026-04-08-m1-max-node22-realworld.txt).
+
+Even with those caveats, the current snapshot does show the implementation is viable for moderate corpus sizes:
+
+| Scenario | Snapshot |
+|---|---|
+| `d=384`, `4-bit`, `N=5000` | `82.4%` recall@10, `11.89 ms` median search in the clustered-query sweep, `196 B/vector` |
+| `d=768`, `4-bit`, `N=3000` | `81.5%` recall@10, `10.37 ms` median search, `388 B/vector` |
+| Sustained load at `N=5000` | `7.87 ms` p50, `10.07 ms` p95, `23.13 ms` p99, `112 q/s` |
+| Web bundle size | `83.7 KiB` raw, `31.1 KiB` gzip |
+
+![Recall vs bit-width](benchmarks/charts/recall-vs-bits.svg)
+
+![Search latency vs corpus size](benchmarks/charts/search-vs-corpus.svg)
+
+![Tail latency under sustained load](benchmarks/charts/tail-latency-5k.svg)
+
+![Bundle size](benchmarks/charts/bundle-size.svg)
+
 ## Development
 
 ### Useful commands
@@ -117,6 +148,7 @@ npm run test        # wasm-bindgen tests in Node
 npm run verify      # cargo check + tests + npm pack dry-run
 npm run bench       # synthetic node benchmark
 npm run bench:realworld
+npm run bench:charts
 ```
 
 If you want a single local entrypoint instead of memorizing scripts:

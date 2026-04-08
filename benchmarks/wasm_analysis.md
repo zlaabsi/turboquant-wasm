@@ -1,5 +1,10 @@
 # turboquant-wasm: Benchmark & Competitive Analysis
 
+> Warning: this document is historical and no longer authoritative.
+> It mixes early estimates, stale competitor comparisons, and implementation notes
+> that predate bit-packing and streaming insertion. Use the benchmark snapshot in
+> `README.md` plus `benchmarks/results/*.json` as the current source of truth.
+
 **Date:** 2026-03-28
 **Module version:** 0.1.0
 **Paper:** arXiv:2504.19874 — "TurboQuant: Online Vector Quantization with Near-optimal Distortion Rate"

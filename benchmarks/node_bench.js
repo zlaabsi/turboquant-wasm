@@ -9,6 +9,8 @@
  */
 
 const path = require('path');
+const fs = require('fs');
+const zlib = require('zlib');
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -58,6 +60,25 @@ function median(arr) {
   const sorted = [...arr].sort((a, b) => a - b);
   const mid = Math.floor(sorted.length / 2);
   return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+}
+
+function measureBundleSizes() {
+  const wasmPath = path.join(__dirname, '..', 'pkg', 'turboquant_wasm_bg.wasm');
+  const jsPath = path.join(__dirname, '..', 'pkg', 'turboquant_wasm.js');
+
+  const wasmRaw = fs.statSync(wasmPath).size;
+  const jsRaw = fs.statSync(jsPath).size;
+  const wasmGzip = zlib.gzipSync(fs.readFileSync(wasmPath), { level: 9 }).length;
+  const jsGzip = zlib.gzipSync(fs.readFileSync(jsPath), { level: 9 }).length;
+
+  return {
+    wasmRaw,
+    jsRaw,
+    wasmGzip,
+    jsGzip,
+    totalRaw: wasmRaw + jsRaw,
+    totalGzip: wasmGzip + jsGzip,
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -216,28 +237,21 @@ async function main() {
   console.log('='.repeat(72));
   console.log('  Bundle Size Summary');
   console.log('='.repeat(72));
-  const fs = require('fs');
-  const wasmPath = path.join(__dirname, '..', 'pkg', 'turboquant_wasm_bg.wasm');
-  const jsPath = path.join(__dirname, '..', 'pkg', 'turboquant_wasm.js');
-
   try {
-    const wasmSize = fs.statSync(wasmPath).size;
-    const jsSize = fs.statSync(jsPath).size;
-    console.log(`  .wasm raw:           ${formatBytes(wasmSize)}`);
-    console.log(`  .js glue raw:        ${formatBytes(jsSize)}`);
-    console.log(`  Total raw:           ${formatBytes(wasmSize + jsSize)}`);
-    console.log(`  .wasm gzip (est):    ~${formatBytes(Math.round(wasmSize * 0.42))}`);
-    console.log(`  Total gzip (est):    ~${formatBytes(Math.round(wasmSize * 0.42 + jsSize * 0.35))}`);
+    const bundle = measureBundleSizes();
+    console.log(`  .wasm raw:           ${formatBytes(bundle.wasmRaw)}`);
+    console.log(`  .js glue raw:        ${formatBytes(bundle.jsRaw)}`);
+    console.log(`  Total raw:           ${formatBytes(bundle.totalRaw)}`);
+    console.log(`  .wasm gzip (-9):     ${formatBytes(bundle.wasmGzip)}`);
+    console.log(`  .js gzip (-9):       ${formatBytes(bundle.jsGzip)}`);
+    console.log(`  Total gzip (-9):     ${formatBytes(bundle.totalGzip)}`);
   } catch (e) {
     console.log(`  Could not read pkg/ files: ${e.message}`);
   }
 
   console.log();
-  console.log('  Comparison:');
-  console.log('  turboquant-wasm:     ~27 KB gzip');
-  console.log('  usearch-wasm:        ~215 KB gzip');
-  console.log('  Voy:                 ~170 KB gzip');
-  console.log('  hnswlib-wasm:        ~325 KB gzip');
+  console.log('  Note: no head-to-head benchmark against competing libraries');
+  console.log('  is committed in this repository yet.');
   console.log();
 
   // ---- Memory efficiency comparison ----

@@ -1,0 +1,91 @@
+
+> @zlaabsi/turboquant-wasm@0.1.0 bench:realworld
+> node benchmarks/realworld_test.js
+
+╔══════════════════════════════════════════════════════════════════════╗
+║           turboquant-wasm — Real-World Usage Tests                  ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  TEST 1: Semantic Search — Clustered Embeddings (d=384, 4-bit)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Corpus: 5000 vectors, 8 clusters, dim=384
+  Queries: 50 (in-distribution, perturbed cluster members)
+
+  Build index:     325.55ms
+  Memory:          957 KB (196 B/vec)
+  Recall@10:       82.4%
+  Search latency:  median=11.89ms, p95=40.65ms, p99=100.18ms
+  Throughput:      ~84 q/s
+
+  Cluster precision: 32.4% of top-10 from same cluster
+  VERDICT: PASS (recall >= 70% required)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  TEST 2: Accuracy vs Bit-Width (d=384, N=5000, 20 queries)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  bits | recall@10 |  MSE      | search(ms) | memory/vec
+  -----+-----------+-----------+------------+-----------
+    1   |   33.5%   |   3.54e-1 |      10.44 |     52 B
+    2   |   55.0%   |   1.11e-1 |      10.43 |    100 B
+    3   |   66.5%   |   3.48e-2 |      16.83 |    148 B
+    4   |   80.0%   |   8.53e-3 |       8.15 |    196 B
+    5   |   90.0%   |   2.41e-3 |      12.20 |    244 B
+    6   |   94.5%   |   6.14e-4 |      10.98 |    292 B
+    7   |   97.0%   |   2.53e-4 |      10.01 |    340 B
+    8   |   96.5%   |   1.08e-4 |       8.60 |    388 B
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  TEST 3: Recall vs Corpus Size (d=384, 4-bit)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       N | recall@10 | recall@1 | build(ms)  | search(ms)
+  -------+-----------+----------+------------+-----------
+      500 |   85.0%   |   80.0%  |         18 |       0.75
+     1000 |   83.5%   |   70.0%  |         35 |       1.51
+     2000 |   78.5%   |   75.0%  |         75 |       3.36
+     5000 |   81.0%   |   85.0%  |        184 |       8.50
+    10000 |   78.5%   |   70.0%  |        418 |      16.09
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  TEST 4: Edge Cases
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  4a. Near-duplicate vectors:
+      Input cosine: 1.00000000, same encoding: true
+  4b. Orthogonal / out-of-distribution query:
+      Results returned: 10 (expected: 10) — PASS
+  4c. k > corpus size:
+      Corpus=5, k=100: returned 5 results — PASS
+  4d. All bit-widths encode/decode without crash:
+      All bits 1-8: PASS
+  4e. Inner product estimate accuracy:
+      True IP: 0.253823, Approx: 0.251934, Error: 0.001889
+      Relative error: 0.7% — PASS
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  TEST 5: Sustained Load — 200 Queries (d=384, 4-bit, N=5000)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Total time:     1.78s for 200 queries
+  Median:         7.87ms
+  p95:            10.07ms
+  p99:            23.13ms
+  Throughput:     112 q/s
+  Latency spikes: 1/200 (>39.36ms) — PASS
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  TEST 6: MPNet Config (d=768, 4-bit, N=3000)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Build:     451.34ms
+  Memory:    1137 KB (388 B/vec)
+  Recall@10: 81.5%
+  Search:    median=10.37ms, p95=11.87ms
+  VERDICT:   PASS
+
+╔══════════════════════════════════════════════════════════════════════╗
+║                         TEST SUMMARY                               ║
+╚══════════════════════════════════════════════════════════════════════╝
+  Clustered search recall@10 (d=384, 4-bit): 82.4%
+  MPNet search recall@10 (d=768, 4-bit):     81.5%
+  Edge cases:                                all passed
+  Sustained load (200 queries):              112 q/s
+  Bundle size (exact):                       83.7 KB raw / 31.0 KB gzip
+

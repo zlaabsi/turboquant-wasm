@@ -1,0 +1,81 @@
+{
+  "captured_at": "2026-04-08",
+  "environment": {
+    "cpu": "Apple M1 Max",
+    "node": "v22.11.0",
+    "npm": "10.9.0",
+    "os": "Darwin 25.3.0 arm64"
+  },
+  "commands": [
+    "npm run bench:realworld",
+    "gzip -c -9 pkg/turboquant_wasm_bg.wasm | wc -c",
+    "gzip -c -9 pkg/turboquant_wasm.js | wc -c",
+    "wc -c pkg/turboquant_wasm_bg.wasm pkg/turboquant_wasm.js"
+  ],
+  "bundle_size": {
+    "wasm_raw_bytes": 63943,
+    "js_raw_bytes": 21768,
+    "wasm_gzip_bytes": 27372,
+    "js_gzip_bytes": 4466,
+    "total_raw_bytes": 85711,
+    "total_gzip_bytes": 31838
+  },
+  "clustered_search_5k_4bit": {
+    "dim": 384,
+    "bits": 4,
+    "corpus_size": 5000,
+    "queries": 50,
+    "build_ms": 325.55,
+    "bytes_per_vector": 196,
+    "recall10_pct": 82.4,
+    "cluster_precision_pct": 32.4,
+    "search_median_ms": 11.89,
+    "search_p95_ms": 40.65,
+    "search_p99_ms": 100.18,
+    "throughput_qps": 84
+  },
+  "accuracy_vs_bits": [
+    { "bits": 1, "recall10_pct": 33.5, "mse": 0.354, "search_ms": 10.44, "memory_bytes_per_vector": 52 },
+    { "bits": 2, "recall10_pct": 55.0, "mse": 0.111, "search_ms": 10.43, "memory_bytes_per_vector": 100 },
+    { "bits": 3, "recall10_pct": 66.5, "mse": 0.0348, "search_ms": 16.83, "memory_bytes_per_vector": 148 },
+    { "bits": 4, "recall10_pct": 80.0, "mse": 0.00853, "search_ms": 8.15, "memory_bytes_per_vector": 196 },
+    { "bits": 5, "recall10_pct": 90.0, "mse": 0.00241, "search_ms": 12.20, "memory_bytes_per_vector": 244 },
+    { "bits": 6, "recall10_pct": 94.5, "mse": 0.000614, "search_ms": 10.98, "memory_bytes_per_vector": 292 },
+    { "bits": 7, "recall10_pct": 97.0, "mse": 0.000253, "search_ms": 10.01, "memory_bytes_per_vector": 340 },
+    { "bits": 8, "recall10_pct": 96.5, "mse": 0.000108, "search_ms": 8.60, "memory_bytes_per_vector": 388 }
+  ],
+  "corpus_scaling_4bit": [
+    { "corpus_size": 500, "recall10_pct": 85.0, "recall1_pct": 80.0, "build_ms_one_shot": 18, "search_ms": 0.75 },
+    { "corpus_size": 1000, "recall10_pct": 83.5, "recall1_pct": 70.0, "build_ms_one_shot": 35, "search_ms": 1.51 },
+    { "corpus_size": 2000, "recall10_pct": 78.5, "recall1_pct": 75.0, "build_ms_one_shot": 75, "search_ms": 3.36 },
+    { "corpus_size": 5000, "recall10_pct": 81.0, "recall1_pct": 85.0, "build_ms_one_shot": 184, "search_ms": 8.50 },
+    { "corpus_size": 10000, "recall10_pct": 78.5, "recall1_pct": 70.0, "build_ms_one_shot": 418, "search_ms": 16.09 }
+  ],
+  "sustained_load_5k_4bit": {
+    "queries": 200,
+    "throughput_qps": 112,
+    "total_time_s": 1.78,
+    "p50_ms": 7.87,
+    "p95_ms": 10.07,
+    "p99_ms": 23.13,
+    "latency_spikes": 1,
+    "spike_threshold_ms": 39.36
+  },
+  "mpnet_3k_4bit": {
+    "dim": 768,
+    "bits": 4,
+    "corpus_size": 3000,
+    "build_ms": 451.34,
+    "bytes_per_vector": 388,
+    "recall10_pct": 81.5,
+    "search_median_ms": 10.37,
+    "search_p95_ms": 11.87
+  },
+  "limitations": [
+    "Single machine snapshot only",
+    "Synthetic clustered embeddings, not a public real-world embedding dataset",
+    "No head-to-head comparison against usearch, Voy, hnswlib, or exact float32 search is committed yet",
+    "Search scaling is from one captured run; use it as directional evidence, not a hard SLA",
+    "Run-to-run variance is still noticeable, so the charts should be read as a local snapshot rather than a portable benchmark suite"
+  ]
+}
