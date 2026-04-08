@@ -1,0 +1,31 @@
+{
+  "source": "benchmarks/wasm_analysis.md",
+  "nature": "hybrid comparison: current turboquant-wasm measurements plus historical alternative estimates from wasm_analysis.md",
+  "notes": [
+    "Alternative library values are extracted from the comparison tables in benchmarks/wasm_analysis.md.",
+    "turboquant-wasm values are refreshed to match the current measured package size and current bit-packed storage formula.",
+    "The result is useful for positioning and tradeoff discussion, not as a fresh reproducible head-to-head benchmark.",
+    "The measured single-project snapshot remains benchmarks/results/2026-04-08-m1-max-node22.json."
+  ],
+  "bundle_size_gzip_kib": [
+    { "library": "turboquant", "value": 31.1, "secondary": "measured now" },
+    { "library": "usearch", "value": 215, "secondary": "HNSW + SIMD" },
+    { "library": "voy", "value": 170, "secondary": "Rust HNSW" },
+    { "library": "hnswlib", "value": 325, "secondary": "C++ via Emscripten" },
+    { "library": "vectra", "value": 50, "secondary": "pure JS" }
+  ],
+  "memory_per_vector_bytes": {
+    "d384_4bit": [
+      { "library": "turboquant", "value": 196, "secondary": "4-bit packed now" },
+      { "library": "usearch", "value": 1536, "secondary": "raw float32" },
+      { "library": "voy", "value": 1536, "secondary": "raw float32" },
+      { "library": "hnswlib", "value": 1536, "secondary": "raw float32" }
+    ],
+    "d1536_4bit": [
+      { "library": "turboquant", "value": 772, "secondary": "4-bit packed now" },
+      { "library": "usearch", "value": 6144, "secondary": "raw float32" },
+      { "library": "voy", "value": 6144, "secondary": "raw float32" },
+      { "library": "hnswlib", "value": 6144, "secondary": "raw float32" }
+    ]
+  }
+}

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="360" viewBox="0 0 860 360" role="img" aria-label="Memory per vector at d=384">
+  <style>
+    .title { font: 700 20px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #0f172a; }
+    .subtitle { font: 400 12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #475569; }
+    .label { font: 600 12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #0f172a; }
+    .secondary { font: 400 11px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #475569; }
+    .tick { font: 400 11px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #64748b; }
+    .value { font: 700 11px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #0f172a; }
+    .axis { font: 600 12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #334155; }
+  </style>
+  <rect width="100%" height="100%" fill="#ffffff" />
+  <text x="70" y="28" class="title">Memory per vector at d=384</text>
+  <text x="70" y="46" class="subtitle">Current packed TurboQuant storage vs historical float32 graph-index estimates</text>
+  <text x="18" y="168" transform="rotate(-90, 18, 168)" class="axis">Bytes per vector</text>
+  
+      <line x1="70" y1="278" x2="836" y2="278" stroke="#e5e7eb" stroke-width="1" />
+      <text x="60" y="282" text-anchor="end" class="tick">0</text>
+    
+
+      <line x1="70" y1="234" x2="836" y2="234" stroke="#e5e7eb" stroke-width="1" />
+      <text x="60" y="238" text-anchor="end" class="tick">400</text>
+    
+
+      <line x1="70" y1="190" x2="836" y2="190" stroke="#e5e7eb" stroke-width="1" />
+      <text x="60" y="194" text-anchor="end" class="tick">800</text>
+    
+
+      <line x1="70" y1="146" x2="836" y2="146" stroke="#e5e7eb" stroke-width="1" />
+      <text x="60" y="150" text-anchor="end" class="tick">1200</text>
+    
+
+      <line x1="70" y1="102" x2="836" y2="102" stroke="#e5e7eb" stroke-width="1" />
+      <text x="60" y="106" text-anchor="end" class="tick">1600</text>
+    
+
+      <line x1="70" y1="58" x2="836" y2="58" stroke="#e5e7eb" stroke-width="1" />
+      <text x="60" y="62" text-anchor="end" class="tick">2000</text>
+    
+  <line x1="70" y1="278" x2="836" y2="278" stroke="#94a3b8" stroke-width="1.5" />
+  
+      <rect x="137.75" y="256.44" width="56" height="21.560000000000002" rx="8" fill="#1d4ed8" />
+      <text x="165.75" y="248.44" text-anchor="middle" class="value">196 B</text>
+      <text x="165.75" y="300" text-anchor="middle" class="label">turboquant</text>
+      <text x="165.75" y="316" text-anchor="middle" class="secondary">4-bit packed now</text>
+    
+
+      <rect x="329.25" y="109.03999999999999" width="56" height="168.96" rx="8" fill="#1d4ed8" />
+      <text x="357.25" y="101.03999999999999" text-anchor="middle" class="value">1536 B</text>
+      <text x="357.25" y="300" text-anchor="middle" class="label">usearch</text>
+      <text x="357.25" y="316" text-anchor="middle" class="secondary">raw float32</text>
+    
+
+      <rect x="520.75" y="109.03999999999999" width="56" height="168.96" rx="8" fill="#1d4ed8" />
+      <text x="548.75" y="101.03999999999999" text-anchor="middle" class="value">1536 B</text>
+      <text x="548.75" y="300" text-anchor="middle" class="label">voy</text>
+      <text x="548.75" y="316" text-anchor="middle" class="secondary">raw float32</text>
+    
+
+      <rect x="712.25" y="109.03999999999999" width="56" height="168.96" rx="8" fill="#1d4ed8" />
+      <text x="740.25" y="101.03999999999999" text-anchor="middle" class="value">1536 B</text>
+      <text x="740.25" y="300" text-anchor="middle" class="label">hnswlib</text>
+      <text x="740.25" y="316" text-anchor="middle" class="secondary">raw float32</text>
+    
+</svg>

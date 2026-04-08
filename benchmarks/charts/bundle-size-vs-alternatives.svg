@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="360" viewBox="0 0 860 360" role="img" aria-label="Bundle size vs alternative browser-side search libraries">
+  <style>
+    .title { font: 700 20px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #0f172a; }
+    .subtitle { font: 400 12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #475569; }
+    .label { font: 600 12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #0f172a; }
+    .secondary { font: 400 11px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #475569; }
+    .tick { font: 400 11px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #64748b; }
+    .value { font: 700 11px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #0f172a; }
+    .axis { font: 600 12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #334155; }
+  </style>
+  <rect width="100%" height="100%" fill="#ffffff" />
+  <text x="70" y="28" class="title">Bundle size vs alternative browser-side search libraries</text>
+  <text x="70" y="46" class="subtitle">Current turboquant-wasm package size vs historical alternative estimates from benchmarks/wasm_analysis.md</text>
+  <text x="18" y="168" transform="rotate(-90, 18, 168)" class="axis">Total gzip size (KiB)</text>
+  
+      <line x1="70" y1="278" x2="836" y2="278" stroke="#e5e7eb" stroke-width="1" />
+      <text x="60" y="282" text-anchor="end" class="tick">0</text>
+    
+
+      <line x1="70" y1="234" x2="836" y2="234" stroke="#e5e7eb" stroke-width="1" />
+      <text x="60" y="238" text-anchor="end" class="tick">100</text>
+    
+
+      <line x1="70" y1="190" x2="836" y2="190" stroke="#e5e7eb" stroke-width="1" />
+      <text x="60" y="194" text-anchor="end" class="tick">200</text>
+    
+
+      <line x1="70" y1="146" x2="836" y2="146" stroke="#e5e7eb" stroke-width="1" />
+      <text x="60" y="150" text-anchor="end" class="tick">300</text>
+    
+
+      <line x1="70" y1="102" x2="836" y2="102" stroke="#e5e7eb" stroke-width="1" />
+      <text x="60" y="106" text-anchor="end" class="tick">400</text>
+    
+
+      <line x1="70" y1="58" x2="836" y2="58" stroke="#e5e7eb" stroke-width="1" />
+      <text x="60" y="62" text-anchor="end" class="tick">500</text>
+    
+  <line x1="70" y1="278" x2="836" y2="278" stroke="#94a3b8" stroke-width="1.5" />
+  
+      <rect x="118.6" y="264.316" width="56" height="13.684000000000001" rx="8" fill="#0f766e" />
+      <text x="146.6" y="256.316" text-anchor="middle" class="value">31.1 KiB</text>
+      <text x="146.6" y="300" text-anchor="middle" class="label">turboquant</text>
+      <text x="146.6" y="316" text-anchor="middle" class="secondary">measured now</text>
+    
+
+      <rect x="271.79999999999995" y="183.4" width="56" height="94.6" rx="8" fill="#0f766e" />
+      <text x="299.79999999999995" y="175.4" text-anchor="middle" class="value">215.0 KiB</text>
+      <text x="299.79999999999995" y="300" text-anchor="middle" class="label">usearch</text>
+      <text x="299.79999999999995" y="316" text-anchor="middle" class="secondary">HNSW + SIMD</text>
+    
+
+      <rect x="425" y="203.2" width="56" height="74.80000000000001" rx="8" fill="#0f766e" />
+      <text x="453" y="195.2" text-anchor="middle" class="value">170.0 KiB</text>
+      <text x="453" y="300" text-anchor="middle" class="label">voy</text>
+      <text x="453" y="316" text-anchor="middle" class="secondary">Rust HNSW</text>
+    
+
+      <rect x="578.1999999999999" y="135" width="56" height="143" rx="8" fill="#0f766e" />
+      <text x="606.1999999999999" y="127" text-anchor="middle" class="value">325.0 KiB</text>
+      <text x="606.1999999999999" y="300" text-anchor="middle" class="label">hnswlib</text>
+      <text x="606.1999999999999" y="316" text-anchor="middle" class="secondary">C++ via Emscripten</text>
+    
+
+      <rect x="731.4" y="256" width="56" height="22" rx="8" fill="#0f766e" />
+      <text x="759.4" y="248" text-anchor="middle" class="value">50.0 KiB</text>
+      <text x="759.4" y="300" text-anchor="middle" class="label">vectra</text>
+      <text x="759.4" y="316" text-anchor="middle" class="secondary">pure JS</text>
+    
+</svg>

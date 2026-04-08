@@ -146,6 +146,18 @@ That means the numbers below are **directional evidence**, not a universal SLA.
 - Raw console log: [benchmarks/results/2026-04-08-m1-max-node22-realworld.txt](benchmarks/results/2026-04-08-m1-max-node22-realworld.txt)
 - Chart generator: [benchmarks/render_charts.js](benchmarks/render_charts.js)
 
+### Comparative context
+
+The charts above are about `turboquant-wasm` alone. The charts below add comparative context using the positioning tables in [benchmarks/wasm_analysis.md](benchmarks/wasm_analysis.md).
+
+Important caveat: these comparative plots are **not** a fresh controlled benchmark suite run side-by-side in this repo. The TurboQuant bars use the current measured package size and current packed storage model; the alternative-library bars come from the historical estimates in `benchmarks/wasm_analysis.md`. They are here for positioning and tradeoff discussion, not to pretend we already have airtight head-to-head numbers.
+
+![Bundle size vs alternatives](benchmarks/charts/bundle-size-vs-alternatives.svg)
+
+![Memory per vector at d=384](benchmarks/charts/memory-d384-vs-alternatives.svg)
+
+![Memory per vector at d=1536](benchmarks/charts/memory-d1536-vs-alternatives.svg)
+
 ### What is still missing
 
 - repeated runs with variance reporting

@@ -1,9 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 
-function latestSnapshot(resultsDir) {
+function latestMeasuredSnapshot(resultsDir) {
   return fs.readdirSync(resultsDir)
-    .filter((name) => name.endsWith('.json'))
+    .filter((name) => /^\d{4}-\d{2}-\d{2}.*\.json$/.test(name))
     .sort()
     .at(-1);
 }
@@ -109,7 +109,7 @@ function main() {
   const outputArg = process.argv[3];
   const inputPath = inputArg
     ? path.resolve(process.cwd(), inputArg)
-    : path.join(resultsDir, latestSnapshot(resultsDir));
+    : path.join(resultsDir, latestMeasuredSnapshot(resultsDir));
   const outputDir = outputArg
     ? path.resolve(process.cwd(), outputArg)
     : path.join(rootDir, 'benchmarks', 'charts');
@@ -184,6 +184,61 @@ function main() {
         { label: 'total gzip', value: kiB(snapshot.bundle_size.total_gzip_bytes) },
       ],
       valueFormatter: (value, tick) => tick ? `${value.toFixed(0)}` : `${value.toFixed(1)} KiB`,
+    })
+  );
+
+  const comparisonPath = path.join(resultsDir, 'analysis-derived-comparison.json');
+  if (!fs.existsSync(comparisonPath)) {
+    return;
+  }
+
+  const comparison = JSON.parse(fs.readFileSync(comparisonPath, 'utf8'));
+
+  writeChart(
+    path.join(outputDir, 'bundle-size-vs-alternatives.svg'),
+    barChartSvg({
+      title: 'Bundle size vs alternative browser-side search libraries',
+      subtitle: 'Current turboquant-wasm package size vs historical alternative estimates from benchmarks/wasm_analysis.md',
+      yLabel: 'Total gzip size (KiB)',
+      color: '#0f766e',
+      data: comparison.bundle_size_gzip_kib.map((row) => ({
+        label: row.library,
+        secondary: row.secondary,
+        value: row.value,
+      })),
+      valueFormatter: (value, tick) => tick ? `${value.toFixed(0)}` : `${value.toFixed(1)} KiB`,
+    })
+  );
+
+  writeChart(
+    path.join(outputDir, 'memory-d384-vs-alternatives.svg'),
+    barChartSvg({
+      title: 'Memory per vector at d=384',
+      subtitle: 'Current packed TurboQuant storage vs historical float32 graph-index estimates',
+      yLabel: 'Bytes per vector',
+      color: '#1d4ed8',
+      data: comparison.memory_per_vector_bytes.d384_4bit.map((row) => ({
+        label: row.library,
+        secondary: row.secondary,
+        value: row.value,
+      })),
+      valueFormatter: (value, tick) => tick ? `${value.toFixed(0)}` : `${value.toFixed(0)} B`,
+    })
+  );
+
+  writeChart(
+    path.join(outputDir, 'memory-d1536-vs-alternatives.svg'),
+    barChartSvg({
+      title: 'Memory per vector at d=1536',
+      subtitle: 'Current packed TurboQuant storage vs historical float32 graph-index estimates',
+      yLabel: 'Bytes per vector',
+      color: '#7c3aed',
+      data: comparison.memory_per_vector_bytes.d1536_4bit.map((row) => ({
+        label: row.library,
+        secondary: row.secondary,
+        value: row.value,
+      })),
+      valueFormatter: (value, tick) => tick ? `${value.toFixed(0)}` : `${value.toFixed(0)} B`,
     })
   );
 }
