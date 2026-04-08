@@ -25,6 +25,72 @@
 - Persistence built in. Save indexes with `save()` and restore them with `Index.load()`.
 - Example-first repo. Includes browser, WebGPU, and Cloudflare demos.
 
+## Bundle Size Analysis
+
+Current `turboquant-wasm` bundle numbers below come from the latest measured snapshot in `benchmarks/results/2026-04-08-m1-max-node22.json`. Alternative-library rows are comparative context from `benchmarks/wasm_analysis.md`, not a fresh side-by-side rerun in this repo.
+
+### Current measured package
+
+| File | Size |
+|---|---|
+| `turboquant_wasm_bg.wasm` | `63,943 bytes` (`62.4 KiB`) |
+| `turboquant_wasm.js` | `21,768 bytes` (`21.3 KiB`) |
+| **Total raw** | **`85,711 bytes` (`83.7 KiB`)** |
+| **`.wasm` gzip** | **`27,372 bytes` (`26.7 KiB`)** |
+| **`js` gzip** | **`4,466 bytes` (`4.4 KiB`)** |
+| **Total gzip** | **`31,838 bytes` (`31.1 KiB`)** |
+
+### Comparison with alternative browser-side vector search libraries
+
+| Library | `.wasm` gzip | JS glue gzip | Total gzip | Notes |
+|---|---|---|---|---|
+| **turboquant-wasm** | **`26.7 KiB`** | **`4.4 KiB`** | **`31.1 KiB`** | Quantization-first, no graph index |
+| usearch-wasm | `~200 KiB` | `~15 KiB` | `~215 KiB` | HNSW + SIMD |
+| Voy | `~150 KiB` | `~20 KiB` | `~170 KiB` | Rust HNSW |
+| hnswlib-wasm | `~300 KiB` | `~25 KiB` | `~325 KiB` | C++ via Emscripten |
+| vectra | `0 KiB` | `~50 KiB` | `~50 KiB` | Pure JS brute-force |
+
+`turboquant-wasm` is materially smaller than graph-based WASM alternatives. That matters most for edge deployments, mobile web, and embedded search widgets where bundle budget is tight.
+
+### Why it stays small
+
+- No HNSW graph or graph-tuning machinery in the binary.
+- No external native dependency stack, BLAS, or LAPACK.
+- A small core: PRNG, orthogonalization, centroid tables, scalar quantization, and compressed brute-force scan.
+- Size-oriented WASM build settings, plus a design that matches the algorithm instead of wrapping a larger ANN engine.
+
+## Feature Comparison
+
+This table keeps the product-level comparison from `benchmarks/wasm_analysis.md`, but refreshes the `turboquant-wasm` numbers to the current implementation.
+
+| Feature | turboquant-wasm | usearch-wasm | Voy | hnswlib-wasm |
+|---|---|---|---|---|
+| **Bundle size (gzip)** | `31.1 KiB` | `~215 KiB` | `~170 KiB` | `~325 KiB` |
+| **Training needed** | No | No, but graph build required | No, but graph build required | No, but graph build required |
+| **Quantization** | `1-8` bit scalar, paper-backed | `8-bit` scalar | None | None |
+| **Search algorithm** | Brute-force scan in rotated domain | HNSW graph | HNSW graph | HNSW graph |
+| **Search complexity** | `O(Nd)` | `O(log N * d)` | `O(log N * d)` | `O(log N * d)` |
+| **Memory per vector (`d=384`, `4-bit`)** | `196 B` | `1,536 B` | `1,536 B` | `1,536 B` |
+| **Memory per vector (`d=1536`, `4-bit`)** | `772 B` | `6,144 B` | `6,144 B` | `6,144 B` |
+| **Compression ratio** | `~8x` at packed `4-bit` | `1x` | `1x` | `1x` |
+| **Index build** | `O(N * d^2)` | `O(N * log N * d)` | `O(N * log N * d)` | `O(N * log N * d)` |
+| **Browser support** | All modern browsers with WASM | Browser WASM targets | Browser WASM targets | Browser WASM targets |
+| **Streaming add** | Yes | Yes | Yes | Yes |
+| **Theoretical guarantees** | MSE-optimal quantization from TurboQuant | None | None | None |
+| **Paper-backed approach** | Yes | No | No | No |
+
+## Key Advantages Summary
+
+| Dimension | turboquant-wasm advantage |
+|---|---|
+| **Bundle size** | About `5.5x` to `10.5x` smaller than graph-based WASM alternatives in the comparison tables, while still smaller than `vectra` in total shipped bytes |
+| **Memory per vector** | About `8x` lower than raw float32 storage at packed `4-bit`, which matters directly in browser and edge memory budgets |
+| **API simplicity** | Build and search without graph parameters, `ef` tuning, connectivity tuning, or external quantization passes |
+| **Theoretical foundation** | Based on the TurboQuant paper rather than a purely heuristic compression layer |
+| **Edge compatibility** | Small enough to fit comfortably in edge/serverless WASM budgets, including Cloudflare Worker-style deployments |
+| **No training** | Centroids are fixed and quantizer creation is deterministic from the chosen seed |
+| **Determinism** | Same seed and same inputs produce the same rotation and the same compressed representation |
+
 ## Good fit
 
 - Static-site search for docs, blogs, and catalogs
