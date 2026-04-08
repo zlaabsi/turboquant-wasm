@@ -36,7 +36,6 @@ function barChartSvg({
   valueFormatter,
   yMax,
   color = '#1d4ed8',
-  badgeText,
   width = 860,
   height = 360,
 }) {
@@ -47,19 +46,6 @@ function barChartSvg({
   const stepCount = 5;
   const band = innerWidth / data.length;
   const barWidth = Math.min(56, band * 0.62);
-  const badge = badgeText
-    ? (() => {
-        const badgeWidth = Math.max(96, badgeText.length * 7 + 18);
-        const badgeX = width - margin.right - badgeWidth;
-        return `
-          <rect x="${badgeX}" y="14" width="${badgeWidth}" height="24" rx="12" fill="#eef2ff" stroke="#c7d2fe" stroke-width="1" />
-          <text x="${badgeX + badgeWidth / 2}" y="30" text-anchor="middle" class="badge">${escapeXml(badgeText)}</text>
-        `;
-      })()
-    : '';
-  const badgeStyle = badgeText
-    ? '\n    .badge { font: 700 11px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #4338ca; }'
-    : '';
 
   const grid = [];
   for (let i = 0; i <= stepCount; i++) {
@@ -101,12 +87,11 @@ function barChartSvg({
     .secondary { font: 400 11px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #475569; }
     .tick { font: 400 11px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #64748b; }
     .value { font: 700 11px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #0f172a; }
-    .axis { font: 600 12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #334155; }${badgeStyle}
+    .axis { font: 600 12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #334155; }
   </style>
   <rect width="100%" height="100%" fill="#ffffff" />
   <text x="${margin.left}" y="28" class="title">${escapeXml(title)}</text>
   <text x="${margin.left}" y="46" class="subtitle">${escapeXml(subtitle)}</text>
-  ${badge}
   <text x="18" y="${margin.top + innerHeight / 2}" transform="rotate(-90, 18, ${margin.top + innerHeight / 2})" class="axis">${escapeXml(yLabel)}</text>
   ${grid.join('\n')}
   <line x1="${margin.left}" y1="${margin.top + innerHeight}" x2="${width - margin.right}" y2="${margin.top + innerHeight}" stroke="#94a3b8" stroke-width="1.5" />
@@ -251,7 +236,6 @@ function main() {
       title: 'Bundle size vs alternative browser-side search libraries',
       subtitle: 'Purple = current turboquant-wasm build. Gray bars = historical alternative estimates from benchmarks/wasm_analysis.md',
       yLabel: 'Total gzip size (KiB)',
-      badgeText: 'Lower is better',
       color: '#0f766e',
       data: highlightComparisonRows(
         comparison.bundle_size_gzip_kib.map((row) => ({
@@ -273,7 +257,6 @@ function main() {
       title: 'Memory per vector at d=384',
       subtitle: 'Purple = current packed TurboQuant storage. Gray bars = historical float32 graph-index estimates',
       yLabel: 'Bytes per vector',
-      badgeText: 'Lower is better',
       color: '#1d4ed8',
       data: highlightComparisonRows(
         comparison.memory_per_vector_bytes.d384_4bit.map((row) => ({
@@ -295,7 +278,6 @@ function main() {
       title: 'Memory per vector at d=1536',
       subtitle: 'Purple = current packed TurboQuant storage. Gray bars = historical float32 graph-index estimates',
       yLabel: 'Bytes per vector',
-      badgeText: 'Lower is better',
       color: '#7c3aed',
       data: highlightComparisonRows(
         comparison.memory_per_vector_bytes.d1536_4bit.map((row) => ({
