@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  Opening comparison chart: the current <code>turboquant-wasm</code> package is about <code>31.1 KiB</code> gzip, while the alternative bars come from the comparison tables in <code>benchmarks/wasm_analysis.md</code>. This is positioning data, not a fresh controlled head-to-head benchmark suite.
+  Fast read: the purple bar is the current <code>turboquant-wasm</code> build at about <code>31.1 KiB</code> gzip. Gray bars are alternative browser-side libraries from the comparison tables in <code>benchmarks/wasm_analysis.md</code>, and the small labels underneath show how much larger they are relative to TurboQuant. This is positioning context rather than a fresh head-to-head rerun.
 </p>
 
 `turboquant-wasm` is a Rust/WebAssembly implementation of TurboQuant Algorithm 1. It is built for applications that already have embeddings and want local retrieval without shipping a vector database or a graph index.
@@ -164,6 +164,8 @@ That means the numbers below are **directional evidence**, not a universal SLA.
 The charts above are about `turboquant-wasm` alone. The charts below add comparative context using the positioning tables in [benchmarks/wasm_analysis.md](benchmarks/wasm_analysis.md).
 
 Important caveat: these comparative plots are **not** a fresh controlled benchmark suite run side-by-side in this repo. The TurboQuant bars use the current measured package size and current packed storage model; the alternative-library bars come from the historical estimates in `benchmarks/wasm_analysis.md`. They are here for positioning and tradeoff discussion, not to pretend we already have airtight head-to-head numbers.
+
+Reading guide: purple is the current measured `turboquant-wasm` result, gray bars are the historical comparison points, and the small labels under the gray bars show the relative overhead versus TurboQuant.
 
 ![Bundle size vs alternatives](benchmarks/charts/bundle-size-vs-alternatives.svg)
 
