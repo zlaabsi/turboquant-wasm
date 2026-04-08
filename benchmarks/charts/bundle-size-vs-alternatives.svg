@@ -11,7 +11,7 @@
   </style>
   <rect width="100%" height="100%" fill="#ffffff" />
   <text x="70" y="28" class="title">Bundle size vs alternative browser-side search libraries</text>
-  <text x="70" y="46" class="subtitle">Purple = current turboquant-wasm build. Gray bars = historical alternative estimates from benchmarks/wasm_analysis.md</text>
+  <text x="70" y="46" class="subtitle">Purple = current measured turboquant-wasm build. Gray bars = comparison estimates documented in benchmarks/wasm_analysis.md</text>
   <text x="18" y="168" transform="rotate(-90, 18, 168)" class="axis">Total gzip size (KiB)</text>
   
       <line x1="70" y1="278" x2="836" y2="278" stroke="#e5e7eb" stroke-width="1" />

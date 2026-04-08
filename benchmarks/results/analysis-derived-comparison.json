@@ -1,8 +1,8 @@
 {
-  "source": "benchmarks/wasm_analysis.md",
-  "nature": "hybrid comparison: current turboquant-wasm measurements plus historical alternative estimates from wasm_analysis.md",
+  "source": "benchmarks/wasm_analysis.md + benchmarks/results/2026-04-08-m1-max-node22.json",
+  "nature": "hybrid comparison: current turboquant-wasm measurements plus maintained alternative-library comparison estimates",
   "notes": [
-    "Alternative library values are extracted from the comparison tables in benchmarks/wasm_analysis.md.",
+    "Alternative library values are maintained comparison estimates documented in benchmarks/wasm_analysis.md.",
     "turboquant-wasm values are refreshed to match the current measured package size and current bit-packed storage formula.",
     "The result is useful for positioning and tradeoff discussion, not as a fresh reproducible head-to-head benchmark.",
     "The measured single-project snapshot remains benchmarks/results/2026-04-08-m1-max-node22.json."

@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  Fast read: the purple bar is the current <code>turboquant-wasm</code> build at about <code>31.1 KiB</code> gzip. Gray bars are alternative browser-side libraries from the comparison tables in <code>benchmarks/wasm_analysis.md</code>, and the small labels underneath show how much larger they are relative to TurboQuant. This is positioning context rather than a fresh head-to-head rerun.
+  Fast read: the purple bar is the current <code>turboquant-wasm</code> build at about <code>31.1 KiB</code> gzip. Gray bars are maintained comparison estimates from <code>benchmarks/wasm_analysis.md</code>, and the small labels underneath show how much larger they are relative to TurboQuant. This is positioning context, not a committed side-by-side rerun against every alternative.
 </p>
 
 `turboquant-wasm` is a Rust/WebAssembly implementation of TurboQuant Algorithm 1. It is built for applications that already have embeddings and want local retrieval without shipping a vector database or a graph index.
@@ -27,7 +27,7 @@
 
 ## Bundle Size Analysis
 
-Current `turboquant-wasm` bundle numbers below come from the latest measured snapshot in `benchmarks/results/2026-04-08-m1-max-node22.json`. Alternative-library rows are comparative context from `benchmarks/wasm_analysis.md`, not a fresh side-by-side rerun in this repo.
+Current `turboquant-wasm` bundle numbers below come from the latest measured snapshot in `benchmarks/results/2026-04-08-m1-max-node22.json`. Alternative-library rows are maintained comparison estimates from `benchmarks/wasm_analysis.md`, not a fresh side-by-side rerun in this repo.
 
 ### Current measured package
 
@@ -56,7 +56,7 @@ Current `turboquant-wasm` bundle numbers below come from the latest measured sna
 
 - No HNSW graph or graph-tuning machinery in the binary.
 - No external native dependency stack, BLAS, or LAPACK.
-- A small core: PRNG, orthogonalization, centroid tables, scalar quantization, and compressed brute-force scan.
+- A small core: PRNG, orthogonalization, centroid tables, scalar quantization, packed storage, and compressed brute-force scan.
 - Size-oriented WASM build settings, plus a design that matches the algorithm instead of wrapping a larger ANN engine.
 
 ## Feature Comparison
@@ -190,6 +190,8 @@ Use these guides when you want an integration pattern instead of a toy demo:
 
 Honest version: the implementation looks useful for moderate corpus sizes, but this repo still does **not** have a full benchmark suite across devices, browsers, public datasets, and competing libraries.
 
+The table below is the current source of truth for measured TurboQuant behavior in this repo. The old March analysis mixed theory, estimates, and older implementation assumptions; `benchmarks/wasm_analysis.md` now explains explicitly why current measured search latency is higher than those early estimates.
+
 Current evidence is a local snapshot on:
 
 - `Apple M1 Max`
@@ -229,9 +231,9 @@ That means the numbers below are **directional evidence**, not a universal SLA.
 
 The charts above are about `turboquant-wasm` alone. The charts below add comparative context using the positioning tables in [benchmarks/wasm_analysis.md](benchmarks/wasm_analysis.md).
 
-Important caveat: these comparative plots are **not** a fresh controlled benchmark suite run side-by-side in this repo. The TurboQuant bars use the current measured package size and current packed storage model; the alternative-library bars come from the historical estimates in `benchmarks/wasm_analysis.md`. They are here for positioning and tradeoff discussion, not to pretend we already have airtight head-to-head numbers.
+Important caveat: these comparative plots are **not** a fresh controlled benchmark suite run side-by-side in this repo. The TurboQuant bars use the current measured package size and current packed storage model; the alternative-library bars come from the maintained comparison estimates in `benchmarks/wasm_analysis.md`. They are here for positioning and tradeoff discussion, not to pretend we already have airtight head-to-head numbers.
 
-Reading guide: purple is the current measured `turboquant-wasm` result, gray bars are the historical comparison points, and the small labels under the gray bars show the relative overhead versus TurboQuant.
+Reading guide: purple is the current measured `turboquant-wasm` result, gray bars are the comparison points documented in `benchmarks/wasm_analysis.md`, and the small labels under the gray bars show the relative overhead versus TurboQuant.
 
 ![Bundle size vs alternatives](benchmarks/charts/bundle-size-vs-alternatives.svg)
 

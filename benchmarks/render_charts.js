@@ -236,7 +236,7 @@ function main() {
     path.join(outputDir, 'bundle-size-vs-alternatives.svg'),
     barChartSvg({
       title: 'Bundle size vs alternative browser-side search libraries',
-      subtitle: 'Purple = current turboquant-wasm build. Gray bars = historical alternative estimates from benchmarks/wasm_analysis.md',
+      subtitle: 'Purple = current measured turboquant-wasm build. Gray bars = comparison estimates documented in benchmarks/wasm_analysis.md',
       yLabel: 'Total gzip size (KiB)',
       color: '#0f766e',
       data: highlightComparisonRows(
@@ -257,7 +257,7 @@ function main() {
     path.join(outputDir, 'memory-d384-vs-alternatives.svg'),
     barChartSvg({
       title: 'Memory per vector at d=384',
-      subtitle: 'Purple = current packed TurboQuant storage. Gray bars = historical float32 graph-index estimates',
+      subtitle: 'Purple = current measured packed TurboQuant storage. Gray bars = comparison estimates documented in benchmarks/wasm_analysis.md',
       yLabel: 'Bytes per vector',
       color: '#1d4ed8',
       data: highlightComparisonRows(
@@ -278,7 +278,7 @@ function main() {
     path.join(outputDir, 'memory-d1536-vs-alternatives.svg'),
     barChartSvg({
       title: 'Memory per vector at d=1536',
-      subtitle: 'Purple = current packed TurboQuant storage. Gray bars = historical float32 graph-index estimates',
+      subtitle: 'Purple = current measured packed TurboQuant storage. Gray bars = comparison estimates documented in benchmarks/wasm_analysis.md',
       yLabel: 'Bytes per vector',
       color: '#7c3aed',
       data: highlightComparisonRows(

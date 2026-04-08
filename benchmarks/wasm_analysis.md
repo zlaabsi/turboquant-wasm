@@ -1,339 +1,211 @@
-# turboquant-wasm: Benchmark & Competitive Analysis
+# turboquant-wasm: Benchmark & Comparative Analysis
 
-> Warning: this document is historical and no longer authoritative.
-> It mixes early estimates, stale competitor comparisons, and implementation notes
-> that predate bit-packing and streaming insertion. Use the benchmark snapshot in
-> `README.md` plus `benchmarks/results/*.json` as the current source of truth.
+> Status: maintained analysis for the current repository.
+> TurboQuant rows in this document are refreshed from `benchmarks/results/2026-04-08-m1-max-node22.json`.
+> Competitor rows remain estimate-based comparison points for positioning. They are useful for tradeoff discussion, not a fresh side-by-side rerun in this repo.
 
-**Date:** 2026-03-28
-**Module version:** 0.1.0
+**Last refreshed:** 2026-04-09  
+**Current TurboQuant snapshot:** 2026-04-08 — Apple M1 Max, Node v22.11.0, npm 10.9.0, Darwin 25.3.0 arm64  
 **Paper:** arXiv:2504.19874 — "TurboQuant: Online Vector Quantization with Near-optimal Distortion Rate"
 
 ---
 
 ## 1. Bundle Size Analysis
 
-### Raw measurements
+### Current measured package
+
+These numbers come directly from the current benchmark snapshot and match the values surfaced in the README.
 
 | File | Size |
 |---|---|
-| `turboquant_wasm_bg.wasm` | 49,901 bytes (48.7 KB) |
-| `turboquant_wasm.js` (glue) | 17,639 bytes (17.2 KB) |
-| **Total raw** | **67,540 bytes (65.9 KB)** |
-| **.wasm gzipped (estimated)** | **~21 KB** |
-| **Total gzipped (estimated)** | **~27 KB** |
+| `turboquant_wasm_bg.wasm` | `63,943 bytes` (`62.4 KiB`) |
+| `turboquant_wasm.js` | `21,768 bytes` (`21.3 KiB`) |
+| **Total raw** | **`85,711 bytes` (`83.7 KiB`)** |
+| **`.wasm` gzip** | **`27,372 bytes` (`26.7 KiB`)** |
+| **`js` gzip** | **`4,466 bytes` (`4.4 KiB`)** |
+| **Total gzip** | **`31,838 bytes` (`31.1 KiB`)** |
 
-> **Note:** The WASM binary is built with `opt-level = "z"` (size-optimized), `lto = true`,
-> `strip = true`, and `codegen-units = 1`. WASM binaries with these settings typically
-> achieve 55-60% gzip compression. Estimated gzip: 49,901 * 0.42 ~ 21 KB.
->
-> To verify: `gzip -c pkg/turboquant_wasm_bg.wasm | wc -c`
+### Comparison with alternative browser-side vector search libraries
 
-### Comparison with competing WASM vector search libraries
+TurboQuant values below are current measured numbers. Alternative-library rows are maintained comparison estimates for browser-side positioning.
 
-| Library | .wasm gzipped | JS glue gzipped | Total gzipped | Notes |
+| Library | `.wasm` gzip | JS glue gzip | Total gzip | Notes |
 |---|---|---|---|---|
-| **turboquant-wasm** | **~21 KB** | **~6 KB** | **~27 KB** | Quantization-only, no graph |
-| usearch-wasm | ~200 KB | ~15 KB | ~215 KB | HNSW graph + SIMD |
-| Voy | ~150 KB | ~20 KB | ~170 KB | HNSW in Rust/WASM |
-| hnswlib-wasm | ~300 KB | ~25 KB | ~325 KB | C++ hnswlib via Emscripten |
-| vectra (JS) | 0 KB (pure JS) | ~50 KB | ~50 KB | Pure JS, no WASM, brute-force |
+| **turboquant-wasm** | **`26.7 KiB`** | **`4.4 KiB`** | **`31.1 KiB`** | Quantization-first, no graph index |
+| usearch-wasm | `~200 KiB` | `~15 KiB` | `~215 KiB` | HNSW + SIMD |
+| Voy | `~150 KiB` | `~20 KiB` | `~170 KiB` | Rust HNSW |
+| hnswlib-wasm | `~300 KiB` | `~25 KiB` | `~325 KiB` | C++ via Emscripten |
+| vectra | `0 KiB` | `~50 KiB` | `~50 KiB` | Pure JS brute-force |
 
-**turboquant-wasm is 6-12x smaller than graph-based alternatives.**
+Current positioning takeaway:
 
-This is the key differentiator for:
-- **Edge/serverless** (Cloudflare Workers has a 1MB WASM limit)
-- **Mobile web** (every KB counts on 3G)
-- **Embedded widgets** (chat components, search bars injected into third-party pages)
+- `turboquant-wasm` is about `6.9x` smaller than `usearch-wasm`.
+- `turboquant-wasm` is about `5.5x` smaller than `Voy`.
+- `turboquant-wasm` is about `10.5x` smaller than `hnswlib-wasm`.
+- `turboquant-wasm` is still about `1.6x` smaller than `vectra` in total shipped bytes.
 
-### Why so small?
+This size profile is the main differentiator for:
 
-turboquant-wasm contains:
-1. A Xoshiro256** PRNG (~200 lines of Rust)
-2. Modified Gram-Schmidt orthogonalization (~30 lines)
-3. Lloyd-Max centroid tables for 1-8 bits (~400 f32 constants = 1.6 KB)
-4. Scalar quantization with binary search (~10 lines)
-5. Brute-force search with rotated-domain optimization (~40 lines)
+- edge/serverless deployments with tight WASM budgets
+- mobile web and embedded widgets where every additional KB hurts
+- client-side search features that should not drag a full graph index into the page
 
-No external dependencies. No HNSW graph. No SIMD intrinsics. No BLAS/LAPACK.
-The algorithm's elegance translates directly to tiny binary size.
+### Why it stays small
+
+- No HNSW graph or graph-tuning machinery in the binary.
+- No external native dependency stack, BLAS, or LAPACK.
+- A small core: PRNG, orthogonalization, centroid tables, scalar quantization, packed storage, and compressed brute-force scan.
+- Size-oriented release settings in `Cargo.toml`, plus an implementation that matches the TurboQuant algorithm instead of wrapping a larger ANN engine.
 
 ---
 
 ## 2. Feature Comparison
 
+The table below keeps the product-level comparison that matters for repo visitors, but refreshes the TurboQuant numbers to the current implementation.
+
 | Feature | turboquant-wasm | usearch-wasm | Voy | hnswlib-wasm |
 |---|---|---|---|---|
-| **Bundle size (gzip)** | ~27 KB | ~215 KB | ~170 KB | ~325 KB |
-| **Training needed** | No | No (graph build) | No (graph build) | No (graph build) |
-| **Quantization** | 1-8 bit scalar (optimal) | 8-bit scalar | None | None |
-| **Search algorithm** | Brute-force (rotated domain) | HNSW graph | HNSW graph | HNSW graph |
-| **Search complexity** | O(Nd) | O(log N * d) | O(log N * d) | O(log N * d) |
-| **Memory per vector (d=384, 4-bit)** | 388 bytes | 1,536 bytes | 1,536 bytes | 1,536 bytes |
-| **Memory per vector (d=1536, 4-bit)** | 1,540 bytes | 6,144 bytes | 6,144 bytes | 6,144 bytes |
-| **Compression ratio** | 3.9x (4-bit) | 1x | 1x | 1x |
-| **Index build** | O(N * d^2) | O(N * log N * d) | O(N * log N * d) | O(N * log N * d) |
-| **Browser support** | All modern browsers | Chrome, Firefox | Chrome, Firefox | Chrome, Firefox |
-| **Streaming add** | Planned (P1) | Yes | Yes | Yes |
-| **Theoretical guarantees** | MSE-optimal (Theorem 1) | None | None | None |
-| **Paper** | ICLR 2026 | No paper | No paper | TPAMI 2020 |
+| **Bundle size (gzip)** | `31.1 KiB` | `~215 KiB` | `~170 KiB` | `~325 KiB` |
+| **Training needed** | No | No, but graph build required | No, but graph build required | No, but graph build required |
+| **Quantization** | `1-8` bit scalar, paper-backed | `8-bit` scalar | None | None |
+| **Search algorithm** | Brute-force scan in rotated domain | HNSW graph | HNSW graph | HNSW graph |
+| **Search complexity** | `O(Nd)` | `O(log N * d)` | `O(log N * d)` | `O(log N * d)` |
+| **Memory per vector (`d=384`, `4-bit`)** | `196 B` | `1,536 B` | `1,536 B` | `1,536 B` |
+| **Memory per vector (`d=1536`, `4-bit`)** | `772 B` | `6,144 B` | `6,144 B` | `6,144 B` |
+| **Compression ratio** | `~8x` at packed `4-bit` | `1x` | `1x` | `1x` |
+| **Index build** | `O(N * d^2)` | `O(N * log N * d)` | `O(N * log N * d)` | `O(N * log N * d)` |
+| **Browser support** | All modern browsers with WASM | Browser WASM targets | Browser WASM targets | Browser WASM targets |
+| **Streaming add** | Yes | Yes | Yes | Yes |
+| **Theoretical guarantees** | MSE-optimal quantization from TurboQuant | None | None | None |
+| **Paper-backed approach** | Yes | No | No | No |
 
-### When to use turboquant-wasm
+### Best fit
 
-**Best fit (N <= 50K):**
-- Client-side RAG with moderate corpus sizes
-- Semantic search in single-page apps
-- Offline-capable search (PWAs)
-- Cloudflare Workers / edge functions (strict size limits)
-- Privacy-sensitive: embeddings never leave the browser
+- client-side RAG with moderate corpus sizes
+- semantic search in SPAs, PWAs, browser extensions, and desktop shells
+- edge endpoints that want a tiny deployable package
+- privacy-sensitive setups where embeddings and documents stay local
 
-**Not ideal for:**
-- N > 100K vectors (brute-force becomes slow; need HNSW)
-- Sub-millisecond latency requirements at scale (graph search is faster for large N)
+### Not the right fit
 
-### The crossover point
-
-For brute-force vs HNSW, the crossover is approximately:
-- d=384: turboquant brute-force is competitive up to N ~ 50K
-- d=1536: turboquant brute-force is competitive up to N ~ 10K
-
-Beyond these sizes, HNSW's O(log N) wins on latency. However, turboquant's 4x memory
-savings mean you can fit 4x more vectors in the same memory budget, which matters in
-browser environments with limited heap.
+- very large corpora where graph ANN is the main requirement
+- workloads targeting sub-millisecond latency at high `N`
+- benchmark claims that require a committed, reproducible, side-by-side rerun against every alternative
 
 ---
 
-## 3. Theoretical Performance Analysis
+## 3. Current Measured Snapshot
 
-### Operations breakdown (from src/lib.rs)
+This is the current local evidence committed in the repo.
 
-#### Quantizer creation: `new(dim, bits, seed)`
-- **Haar matrix generation:** O(d^2) random normals + O(d^3) Gram-Schmidt
-- **One-time cost**, amortized over all encode/search operations
-- d=384: ~150K random normals + ~57M FLOPs for Gram-Schmidt
-- d=1536: ~2.4M random normals + ~3.6B FLOPs for Gram-Schmidt
+### Environment
 
-#### Encode (per vector): `encode(embedding)`
-- Norm computation: O(d)
-- Matrix-vector multiply (rotation): O(d^2)
-- Scalar quantization (binary search on boundaries): O(d * log(2^b)) = O(d * b)
-- **Total: O(d^2)** dominated by rotation
+- `Apple M1 Max`
+- `Node v22.11.0`
+- `npm 10.9.0`
+- `Darwin 25.3.0 arm64`
+- synthetic clustered embeddings
 
-#### Build index: `build_index(quantizer, embeddings, n)`
-- Per vector: norm + rotation + quantize = O(d^2)
-- **Total: O(N * d^2)**
+### Snapshot summary
 
-#### Search: `index.search(quantizer, query, k)`
-- Rotate query once: O(d^2)
-- Per database vector: dot product with centroid lookup = O(d)
-- Sort top-k: O(N log N) (currently full sort; could be O(N + k log k) with partial sort)
-- **Total: O(d^2 + N*d + N log N)**
+| Scenario | Result |
+|---|---|
+| `d=384`, `4-bit`, `N=5000` | `82.4%` recall@10, `11.89 ms` median search, `196 B/vector` |
+| `d=384`, `4-bit`, `N=10000` | `78.5%` recall@10, `16.09 ms` search |
+| `d=768`, `4-bit`, `N=3000` | `81.5%` recall@10, `10.37 ms` median search, `388 B/vector` |
+| Sustained load at `N=5000` | `7.87 ms` p50, `10.07 ms` p95, `23.13 ms` p99, `112 q/s` |
+| Web package size | `83.7 KiB` raw, `31.1 KiB` gzip |
 
-### Estimated wall-clock times
+### Important limits on this snapshot
 
-These estimates assume a modern browser (V8/SpiderMonkey) executing WASM at approximately
-1 GFLOP/s for sequential scalar operations (no SIMD). Real performance will vary by
-browser and hardware.
+- single machine only
+- Node.js benchmark, not a browser matrix
+- synthetic clustered embeddings, not a public benchmark corpus
+- no committed side-by-side rerun against usearch, Voy, hnswlib, or exact float32 search
 
-#### d = 384 (MiniLM, all-MiniLM-L6-v2)
+The charts in `benchmarks/charts/` are generated directly from this snapshot plus the maintained comparison table in this document.
 
-| Operation | FLOPs | Estimated time |
-|---|---|---|
-| Quantizer creation | ~57M | ~60 ms |
-| Encode (1 vector) | ~295K | ~0.3 ms |
-| Build index (1K vectors) | ~295M | ~300 ms |
-| Build index (10K vectors) | ~2.95B | ~3 s |
-| Search (query rotation) | ~295K | ~0.3 ms |
-| Search (10K vectors, scan) | ~3.84M | ~4 ms |
-| **Search total (10K)** | ~4.1M | **~4.3 ms** |
-| Search (50K vectors, scan) | ~19.2M | ~19 ms |
-| **Search total (50K)** | ~19.5M | **~20 ms** |
+---
 
-#### d = 1536 (OpenAI text-embedding-3-small / ada-002)
+## 4. Why Current Measured Latencies Are Worse Than the March Estimates
 
-| Operation | FLOPs | Estimated time |
-|---|---|---|
-| Quantizer creation | ~3.6B | ~3.6 s |
-| Encode (1 vector) | ~4.7M | ~5 ms |
-| Build index (1K vectors) | ~4.7B | ~5 s |
-| Build index (10K vectors) | ~47B | ~47 s |
-| Search (query rotation) | ~4.7M | ~5 ms |
-| Search (10K vectors, scan) | ~15.4M | ~15 ms |
-| **Search total (10K)** | ~20M | **~20 ms** |
-| Search (50K vectors, scan) | ~76.8M | ~77 ms |
-| **Search total (50K)** | ~81.5M | **~82 ms** |
+The short answer is that the old March analysis mixed several kinds of numbers:
 
-> **Key insight:** The query rotation O(d^2) is a one-time cost per search call.
-> The per-vector scan O(d) is very fast because it is a simple centroid-lookup + multiply + accumulate.
-> This is the paper's core optimization: rotate once, scan cheaply.
+- exact and estimated bundle-size values
+- theoretical FLOP-based latency estimates
+- implementation notes from before bit-packing and streaming insertion landed
+- simplified assumptions about browser/WASM execution cost
 
-### Memory footprint
+So the March document was never a pure measured benchmark report. It was part sizing note, part theory note, part rough planning model.
 
-| Configuration | Per vector | 10K vectors | 50K vectors |
+### Where the old March analysis was too optimistic
+
+| Metric | March analysis | Current reality | Why they differ |
 |---|---|---|---|
-| d=384, 4-bit (u8 index) | 388 B | 3.8 MB | 18.9 MB |
-| d=384, float32 (uncompressed) | 1,536 B | 14.6 MB | 73.2 MB |
-| d=1536, 4-bit (u8 index) | 1,540 B | 14.6 MB | 73.2 MB |
-| d=1536, float32 (uncompressed) | 6,144 B | 58.6 MB | 292.9 MB |
+| Search total, `d=384`, `N=10000` | `~4.3 ms` estimated | `16.09 ms` measured | The March figure was a FLOP-based estimate, not a real measurement |
+| Search total, `d=1536`, `N=10000` | `~20 ms` estimated | no committed measured rerun at that exact point | The old number was still theoretical and should not have been read as a benchmark |
 
-> **Note:** Current implementation uses 1 byte per dimension (no bit-packing).
-> True 4-bit packing would halve storage to d/2 bytes per vector.
-> This is planned as P1 item #6 in CLAUDE.md.
+### Main reasons for the gap
 
----
+- The March search numbers were back-of-the-envelope throughput estimates, not timings captured from the shipping Node/WASM package.
+- The current implementation uses bit-packed storage. That cuts memory dramatically, but search now pays real unpacking cost per coordinate during scan.
+- The old model mostly counted arithmetic work. Real search time also includes memory traffic, centroid lookup overhead, packed-code extraction, and top-k selection/sorting.
+- The benchmark harness measures actual end-to-end `index.search(...)` through the wasm-bindgen surface, not just an idealized inner loop.
+- Runtime behavior in Node/V8 with a real WASM module does not match a simple “1 GFLOP/s scalar” assumption closely enough to publish as a final latency claim.
 
-## 4. API Surface Analysis
+### What improved versus March
 
-### Core API (3 functions, 2 classes)
+Not everything got worse. Some parts improved substantially:
 
-```typescript
-// 1. Create a quantizer (one-time setup)
-const quantizer = await createQuantizer({
-  dim: 384,    // embedding dimension
-  bits: 4,     // bits per coordinate (1-8, default: 4)
-  seed: 42n,   // rotation matrix seed (default: 42n)
-});
-
-// 2. Build an index from embeddings
-const embeddings = new Float32Array(n * dim);  // row-major
-const index = quantizer.buildIndex(embeddings, n);
-
-// 3. Search
-const topK: number[] = index.search(queryVector, 10);
-```
-
-### Additional utilities
-
-```typescript
-// Encode a single vector
-const { indices, norm } = quantizer.encode(embedding);
-
-// Decode back to approximate float32
-const approx: Float32Array = quantizer.decode(indices, norm);
-
-// Estimate inner product without full decode
-const score: number = quantizer.innerProduct(indices, norm, query);
-
-// Flatten array-of-arrays to Float32Array
-const flat = flattenEmbeddings(embeddingArrays);
-
-// Properties
-quantizer.dim;              // 384
-quantizer.bits;             // 4
-quantizer.compressionRatio; // ~3.9
-index.size;                 // number of vectors
-index.memoryBytes;          // bytes used by index
-```
-
-### Comparison with usearch-wasm API
-
-```typescript
-// usearch — 6 steps, more complex
-import { Index } from 'usearch';
-const index = new Index({ metric: 'ip', connectivity: 16, dimensions: 384 });
-index.reserve(10000);
-for (let i = 0; i < vectors.length; i++) {
-  index.add(BigInt(i), vectors[i]);
-}
-const results = index.search(query, 10);
-```
-
-```typescript
-// Voy — similar complexity
-import { Voy } from 'voy-search';
-const resource = { embeddings: vectors.map((v, i) => ({ id: String(i), embeddings: v, title: '' })) };
-const index = new Voy(resource);
-const results = index.search(query, 10);
-```
-
-```typescript
-// turboquant-wasm — 3 lines
-const quantizer = await createQuantizer({ dim: 384 });
-const index = quantizer.buildIndex(flat, n);
-const results = index.search(query, 10);
-```
-
-**turboquant-wasm has the simplest API** because:
-- No graph parameters to tune (connectivity, ef_construction, ef_search)
-- No metric selection (always inner product, which subsumes cosine for normalized vectors)
-- No ID management (indices are positional)
-- Quantization is built-in, not a separate step
-
----
-
-## 5. Compression Quality (from paper Theorem 1)
-
-The MSE of Algorithm 1 for unit vectors follows:
-
-| Bits | MSE per dim | Relative error | Compression ratio |
+| Metric | March analysis | Current reality | Why it improved |
 |---|---|---|---|
-| 1 | 0.3634 | 36.3% | ~3.9x (no bit-pack) |
-| 2 | 0.1175 | 11.8% | ~3.9x (no bit-pack) |
-| 3 | 0.0302 | 3.0% | ~3.9x (no bit-pack) |
-| **4** | **0.0095** | **0.95%** | **~3.9x (no bit-pack)** |
-| 5 | 0.00252 | 0.25% | ~3.9x (no bit-pack) |
-| 6 | 0.000699 | 0.07% | ~3.9x (no bit-pack) |
-| 7 | 0.000252 | 0.025% | ~3.9x (no bit-pack) |
-| 8 | 0.000100 | 0.01% | ~3.9x (no bit-pack) |
+| Memory per vector, `d=384`, `4-bit` | `388 B` | `196 B` | Bit-packing is now implemented |
+| Memory per vector, `d=1536`, `4-bit` | `1,540 B` | `772 B` | Bit-packing is now implemented |
+| Streaming add | Planned | Implemented | Incremental insertion landed |
+| Build index, `d=384`, `N=10000` | `~3 s` estimated | `418 ms` measured | The old estimate was rough and current code benefits from the actual implementation path, including SIMD-enabled rotation |
 
-> **Note:** Current implementation stores quantized indices as u8 (1 byte per dimension)
-> regardless of bit-width. True compression ratio with bit-packing:
-> - 1-bit: 32x (d/8 bytes + 4 bytes norm)
-> - 2-bit: 16x
-> - 4-bit: 8x
-> - 8-bit: 4x (same as current)
->
-> Bit-packing is a planned P1 improvement.
-
-**4-bit is the sweet spot**: sub-1% MSE with meaningful compression. For semantic search
-(where ranking matters more than exact scores), even 2-bit quantization often preserves
-recall@10 above 90%.
+If by "scores" you meant recall rather than latency, the March document did not actually publish higher measured recall@10 values. It mostly cited theoretical distortion/MSE expectations from the paper, which are related to quantization quality but are not the same metric as measured retrieval recall.
 
 ---
 
-## 6. Key Advantages Summary
+## 5. Key Advantages Summary
 
 | Dimension | turboquant-wasm advantage |
 |---|---|
-| **Bundle size** | 6-12x smaller than alternatives (~27 KB gzip vs 170-325 KB) |
-| **Memory per vector** | 4x less than uncompressed (with bit-packing: up to 32x) |
-| **API simplicity** | 3 lines to build + search, no graph parameters |
-| **Theoretical foundation** | MSE-optimal quantization (ICLR 2026 paper) |
-| **Edge compatibility** | Fits in Cloudflare Workers 1MB WASM limit with room to spare |
-| **No training** | Centroids are pre-computed from N(0,1); rotation is deterministic from seed |
-| **Deterministic** | Same seed = same rotation matrix = reproducible results |
+| **Bundle size** | About `5.5x` to `10.5x` smaller than graph-based WASM alternatives in the maintained comparison table, while still smaller than `vectra` in total shipped bytes |
+| **Memory per vector** | About `8x` lower than raw float32 storage at packed `4-bit`, which directly helps browser and edge memory budgets |
+| **API simplicity** | Build and search without graph parameters, `ef` tuning, connectivity tuning, or separate quantization passes |
+| **Theoretical foundation** | Based on the TurboQuant paper rather than a purely heuristic compression layer |
+| **Edge compatibility** | Small enough to fit comfortably in edge/serverless WASM budgets, including Cloudflare Worker-style deployments |
+| **No training** | Centroids are fixed and quantizer creation is deterministic from the chosen seed |
+| **Determinism** | Same seed and same inputs produce the same rotation and the same compressed representation |
 
-### Trade-offs
+---
+
+## 6. Trade-offs
 
 | Dimension | Limitation |
 |---|---|
-| **Search speed at scale** | Brute-force O(Nd); for N > 50K, HNSW is faster |
-| **No SIMD yet** | Could be 4-8x faster with wasm32 SIMD (planned P1) |
-| **No bit-packing yet** | u8 storage wastes bits for b < 8 (planned P1) |
-| **No streaming add** | Must rebuild index to add vectors (planned P1) |
-| **Quantizer init for large d** | O(d^3) Gram-Schmidt is slow for d > 1024 |
+| **Search speed at scale** | Search still scales linearly in `N`, so graph ANN wins first on very large corpora |
+| **Packed scan cost** | Bit-packing saves memory but adds unpacking work during search |
+| **Snapshot breadth** | Current benchmark evidence is still a single-machine snapshot, not a broad device/browser matrix |
+| **Competitor comparisons** | Alternative-library rows are maintained estimates, not a committed fresh rerun in this repo |
+| **Quantizer init at high dimension** | Quantizer creation remains more noticeable as `dim` grows because the rotation setup is not free |
 
 ---
 
-## 7. Recommended Benchmark Procedure
-
-To reproduce these estimates with real measurements, run:
+## 7. Reproducing the Current Snapshot
 
 ```bash
-# Build for Node.js
-wasm-pack build --target nodejs --out-dir pkg-node
-
-# Run the benchmark
-node benchmarks/node_bench.js
+npm run build:web
+npm run build:node
+npm run bench:realworld
+npm run bench:charts
 ```
 
-The benchmark script (`benchmarks/node_bench.js`) measures:
-1. Quantizer creation time for d=384 and d=1536
-2. Index build time for N=1K, 5K, 10K vectors
-3. Search latency for k=10
-4. Memory usage
-5. Encode/decode roundtrip fidelity (MSE verification)
+Artifacts:
 
----
-
-*Generated from source analysis of turboquant-wasm v0.1.0 (commit: pre-release)*
+- measured snapshot: `benchmarks/results/2026-04-08-m1-max-node22.json`
+- raw log: `benchmarks/results/2026-04-08-m1-max-node22-realworld.txt`
+- comparison data for charts: `benchmarks/results/analysis-derived-comparison.json`
+- generated charts: `benchmarks/charts/*.svg`
