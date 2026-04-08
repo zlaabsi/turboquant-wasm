@@ -58,7 +58,7 @@ Normal release flow:
 3. Push the release commit to `main`.
 4. Create and push the matching git tag.
 
-The release workflow will validate the tag, run checks, attach the tarball to the GitHub Release, and publish to npm when the `NPM_TOKEN` repository secret is present.
+The release workflow will validate the tag, run checks, attach the tarball to the GitHub Release, and publish to npm when the `NPM_TOKEN` repository secret is present. It also supports manual dispatch from the GitHub Actions UI for rerunning a release.
 
 ## Pull Request Expectations
 

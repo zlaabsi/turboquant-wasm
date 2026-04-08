@@ -134,6 +134,7 @@ make serve PORT=8080
 3. Push `main`.
 4. Create and push a matching tag such as `v0.1.0`.
 5. The `release` workflow publishes a GitHub Release and publishes to npm when `NPM_TOKEN` is configured.
+6. You can also trigger the workflow manually from GitHub Actions if you need to rerun a tag release.
 
 ### Run the examples locally
 
