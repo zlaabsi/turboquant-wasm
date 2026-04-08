@@ -16,6 +16,17 @@
 
 `turboquant-wasm` is a Rust/WebAssembly implementation of the TurboQuant MSE variant (Algorithm 1 from the paper). It is built for applications that already have embeddings and want local retrieval without shipping a vector database or a graph index.
 
+## Why this repo does not ship the QJL variant
+
+The short version is that QJL works against the main design goal of `turboquant-wasm`: keep browser-side retrieval small and memory-efficient.
+
+- QJL adds an extra projection matrix, which materially increases runtime memory pressure.
+- In browser and WASM settings, that extra matrix becomes expensive quickly, especially once embedding dimensions get large.
+- The MSE variant already gives strong recall for the bit-rates this repo actually targets in practice, especially at `3+` bits.
+- For this project, the tradeoff was not worth it: more complexity and more memory, without fitting the core promise of a tiny browser-first package.
+
+So the repo deliberately optimizes for the TurboQuant MSE path: smaller package, lower memory footprint, simpler runtime story.
+
 ## At a glance
 
 - Small web package. The current measured build is about `31.1 KiB` gzip.
