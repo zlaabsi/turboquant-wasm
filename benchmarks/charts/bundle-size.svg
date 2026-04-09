@@ -11,7 +11,7 @@
   </style>
   <rect width="100%" height="100%" fill="#ffffff" />
   <text x="70" y="28" class="title">Bundle size</text>
-  <text x="70" y="46" class="subtitle">Measured on the generated web package with gzip -9</text>
+  <text x="70" y="46" class="subtitle">Measured on the current npm browser package with gzip -9</text>
   <text x="18" y="168" transform="rotate(-90, 18, 168)" class="axis">Size (KiB)</text>
   
       <line x1="70" y1="278" x2="836" y2="278" stroke="#e5e7eb" stroke-width="1" />
@@ -45,32 +45,32 @@
       
     
 
-      <rect x="233.50000000000003" y="219.19296874999998" width="56" height="58.80703125000001" rx="8" fill="#b45309" stroke="none" stroke-width="0" />
-      <text x="261.5" y="211.19296874999998" text-anchor="middle" class="value" style="fill: #0f172a;">26.7 KiB</text>
+      <rect x="233.50000000000003" y="219.3927734375" width="56" height="58.6072265625" rx="8" fill="#b45309" stroke="none" stroke-width="0" />
+      <text x="261.5" y="211.3927734375" text-anchor="middle" class="value" style="fill: #0f172a;">26.6 KiB</text>
       <text x="261.5" y="300" text-anchor="middle" class="label" style="fill: #0f172a;">wasm gzip</text>
       
     
 
-      <rect x="361.1666666666667" y="231.2328125" width="56" height="46.7671875" rx="8" fill="#b45309" stroke="none" stroke-width="0" />
-      <text x="389.1666666666667" y="223.2328125" text-anchor="middle" class="value" style="fill: #0f172a;">21.3 KiB</text>
+      <rect x="361.1666666666667" y="238.2732421875" width="56" height="39.7267578125" rx="8" fill="#b45309" stroke="none" stroke-width="0" />
+      <text x="389.1666666666667" y="230.2732421875" text-anchor="middle" class="value" style="fill: #0f172a;">18.1 KiB</text>
       <text x="389.1666666666667" y="300" text-anchor="middle" class="label" style="fill: #0f172a;">js raw</text>
       
     
 
-      <rect x="488.8333333333333" y="268.405078125" width="56" height="9.594921874999999" rx="8" fill="#b45309" stroke="none" stroke-width="0" />
-      <text x="516.8333333333333" y="260.405078125" text-anchor="middle" class="value" style="fill: #0f172a;">4.4 KiB</text>
+      <rect x="488.8333333333333" y="269.926171875" width="56" height="8.073828125" rx="8" fill="#b45309" stroke="none" stroke-width="0" />
+      <text x="516.8333333333333" y="261.926171875" text-anchor="middle" class="value" style="fill: #0f172a;">3.7 KiB</text>
       <text x="516.8333333333333" y="300" text-anchor="middle" class="label" style="fill: #0f172a;">js gzip</text>
       
     
 
-      <rect x="616.5000000000001" y="93.85527343749999" width="56" height="184.1447265625" rx="8" fill="#b45309" stroke="none" stroke-width="0" />
-      <text x="644.5000000000001" y="85.85527343749999" text-anchor="middle" class="value" style="fill: #0f172a;">83.7 KiB</text>
+      <rect x="616.5000000000001" y="100.89570312499998" width="56" height="177.10429687500002" rx="8" fill="#b45309" stroke="none" stroke-width="0" />
+      <text x="644.5000000000001" y="92.89570312499998" text-anchor="middle" class="value" style="fill: #0f172a;">80.5 KiB</text>
       <text x="644.5000000000001" y="300" text-anchor="middle" class="label" style="fill: #0f172a;">total raw</text>
       
     
 
-      <rect x="744.1666666666667" y="209.598046875" width="56" height="68.401953125" rx="8" fill="#b45309" stroke="none" stroke-width="0" />
-      <text x="772.1666666666667" y="201.598046875" text-anchor="middle" class="value" style="fill: #0f172a;">31.1 KiB</text>
+      <rect x="744.1666666666667" y="211.3189453125" width="56" height="66.6810546875" rx="8" fill="#b45309" stroke="none" stroke-width="0" />
+      <text x="772.1666666666667" y="203.3189453125" text-anchor="middle" class="value" style="fill: #0f172a;">30.3 KiB</text>
       <text x="772.1666666666667" y="300" text-anchor="middle" class="label" style="fill: #0f172a;">total gzip</text>
       
     

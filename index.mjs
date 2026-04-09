@@ -1,17 +1,8 @@
-import init, {
+import {
   TurboQuantizer as WasmQuantizer,
   CompressedIndex as WasmIndex,
   build_index,
-} from "./pkg/turboquant_wasm.js";
-
-let initPromise = null;
-
-function ensureInit() {
-  if (!initPromise) {
-    initPromise = init();
-  }
-  return initPromise;
-}
+} from "./pkg-bundler/turboquant_wasm.js";
 
 function normalizeSeed(seed = 42n) {
   return typeof seed === "bigint" ? seed : BigInt(seed);
@@ -99,8 +90,6 @@ export class Index {
 }
 
 export async function createQuantizer(options) {
-  await ensureInit();
-
   const bits = options.bits ?? 4;
   const seed = normalizeSeed(options.seed);
   const inner = new WasmQuantizer(options.dim, bits, seed);

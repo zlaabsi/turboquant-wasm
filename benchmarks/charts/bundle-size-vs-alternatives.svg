@@ -39,8 +39,8 @@
     
   <line x1="70" y1="278" x2="836" y2="278" stroke="#94a3b8" stroke-width="1.5" />
   
-      <rect x="118.6" y="264.316" width="56" height="13.684000000000001" rx="8" fill="#635bff" stroke="#4338ca" stroke-width="1.5" />
-      <text x="146.6" y="256.316" text-anchor="middle" class="value" style="fill: #4338ca;">31.1 KiB</text>
+      <rect x="118.6" y="264.668" width="56" height="13.332" rx="8" fill="#635bff" stroke="#4338ca" stroke-width="1.5" />
+      <text x="146.6" y="256.668" text-anchor="middle" class="value" style="fill: #4338ca;">30.3 KiB</text>
       <text x="146.6" y="300" text-anchor="middle" class="label" style="fill: #4338ca;">turboquant</text>
       <text x="146.6" y="316" text-anchor="middle" class="secondary" style="fill: #4338ca;">current build</text>
     
@@ -48,24 +48,24 @@
       <rect x="271.79999999999995" y="183.4" width="56" height="94.6" rx="8" fill="#9aa7b6" stroke="none" stroke-width="0" />
       <text x="299.79999999999995" y="175.4" text-anchor="middle" class="value" style="fill: #0f172a;">215.0 KiB</text>
       <text x="299.79999999999995" y="300" text-anchor="middle" class="label" style="fill: #0f172a;">usearch</text>
-      <text x="299.79999999999995" y="316" text-anchor="middle" class="secondary" style="fill: #64748b;">6.9x larger</text>
+      <text x="299.79999999999995" y="316" text-anchor="middle" class="secondary" style="fill: #64748b;">7.1x larger</text>
     
 
       <rect x="425" y="203.2" width="56" height="74.80000000000001" rx="8" fill="#9aa7b6" stroke="none" stroke-width="0" />
       <text x="453" y="195.2" text-anchor="middle" class="value" style="fill: #0f172a;">170.0 KiB</text>
       <text x="453" y="300" text-anchor="middle" class="label" style="fill: #0f172a;">voy</text>
-      <text x="453" y="316" text-anchor="middle" class="secondary" style="fill: #64748b;">5.5x larger</text>
+      <text x="453" y="316" text-anchor="middle" class="secondary" style="fill: #64748b;">5.6x larger</text>
     
 
       <rect x="578.1999999999999" y="135" width="56" height="143" rx="8" fill="#9aa7b6" stroke="none" stroke-width="0" />
       <text x="606.1999999999999" y="127" text-anchor="middle" class="value" style="fill: #0f172a;">325.0 KiB</text>
       <text x="606.1999999999999" y="300" text-anchor="middle" class="label" style="fill: #0f172a;">hnswlib</text>
-      <text x="606.1999999999999" y="316" text-anchor="middle" class="secondary" style="fill: #64748b;">10.5x larger</text>
+      <text x="606.1999999999999" y="316" text-anchor="middle" class="secondary" style="fill: #64748b;">10.7x larger</text>
     
 
       <rect x="731.4" y="256" width="56" height="22" rx="8" fill="#9aa7b6" stroke="none" stroke-width="0" />
       <text x="759.4" y="248" text-anchor="middle" class="value" style="fill: #0f172a;">50.0 KiB</text>
       <text x="759.4" y="300" text-anchor="middle" class="label" style="fill: #0f172a;">vectra</text>
-      <text x="759.4" y="316" text-anchor="middle" class="secondary" style="fill: #64748b;">1.6x larger</text>
+      <text x="759.4" y="316" text-anchor="middle" class="secondary" style="fill: #64748b;">1.7x larger</text>
     
 </svg>

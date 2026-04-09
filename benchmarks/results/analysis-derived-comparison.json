@@ -1,14 +1,14 @@
 {
-  "source": "benchmarks/wasm_analysis.md + benchmarks/results/2026-04-08-m1-max-node22.json",
+  "source": "benchmarks/wasm_analysis.md + benchmarks/results/2026-04-09-m1-max-node22.json",
   "nature": "hybrid comparison: current turboquant-wasm measurements plus maintained alternative-library comparison estimates",
   "notes": [
     "Alternative library values are maintained comparison estimates documented in benchmarks/wasm_analysis.md.",
     "turboquant-wasm values are refreshed to match the current measured package size and current bit-packed storage formula.",
     "The result is useful for positioning and tradeoff discussion, not as a fresh reproducible head-to-head benchmark.",
-    "The measured single-project snapshot remains benchmarks/results/2026-04-08-m1-max-node22.json."
+    "The measured single-project snapshot remains benchmarks/results/2026-04-09-m1-max-node22.json."
   ],
   "bundle_size_gzip_kib": [
-    { "library": "turboquant", "value": 31.1, "secondary": "measured now" },
+    { "library": "turboquant", "value": 30.3, "secondary": "measured now" },
     { "library": "usearch", "value": 215, "secondary": "HNSW + SIMD" },
     { "library": "voy", "value": 170, "secondary": "Rust HNSW" },
     { "library": "hnswlib", "value": 325, "secondary": "C++ via Emscripten" },

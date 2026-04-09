@@ -15,6 +15,7 @@ results/*.json
 results/*.png
 target/
 pkg/
+pkg-bundler/
 pkg-node/
 node_modules/
 *.wasm

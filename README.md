@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  Fast read: the purple bar is the current <code>turboquant-wasm</code> build at about <code>31.1 KiB</code> gzip. Gray bars are maintained comparison estimates from <code>benchmarks/wasm_analysis.md</code>, and the small labels underneath show how much larger they are relative to TurboQuant. This is positioning context, not a committed side-by-side rerun against every alternative.
+  Fast read: the purple bar is the current <code>turboquant-wasm</code> browser npm build at about <code>30.3 KiB</code> gzip. Gray bars are maintained comparison estimates from <code>benchmarks/wasm_analysis.md</code>, and the small labels underneath show how much larger they are relative to TurboQuant. This is positioning context, not a committed side-by-side rerun against every alternative.
 </p>
 
 `turboquant-wasm` is a Rust/WebAssembly implementation of the TurboQuant MSE variant (Algorithm 1 from the paper). It is built for applications that already have embeddings and want local retrieval without shipping a vector database or a graph index.
@@ -29,7 +29,7 @@ So the repo deliberately optimizes for the TurboQuant MSE path: smaller package,
 
 ## At a glance
 
-- Small web package. The current measured build is about `31.1 KiB` gzip.
+- Small web package. The current measured browser npm build is about `30.3 KiB` gzip.
 - Aggressive compression. With `4-bit` quantization, a `384d` vector takes about `196 B` and a `768d` vector about `388 B`.
 - Direct search on compressed vectors. No full decode step on every query.
 - Portable packaging. Runs in browsers, Node.js, and WASM-friendly edge runtimes.
@@ -38,7 +38,7 @@ So the repo deliberately optimizes for the TurboQuant MSE path: smaller package,
 
 ## Bundle Size Analysis
 
-Current `turboquant-wasm` bundle numbers below come from the latest measured snapshot in `benchmarks/results/2026-04-08-m1-max-node22.json`. Alternative-library rows are maintained comparison estimates from `benchmarks/wasm_analysis.md`, not a fresh side-by-side rerun in this repo.
+Current `turboquant-wasm` bundle numbers below come from the latest measured snapshot in `benchmarks/results/2026-04-09-m1-max-node22.json`. That snapshot keeps the `2026-04-08` search measurements and refreshes the browser npm package size to the current `pkg-bundler/` output. Alternative-library rows are maintained comparison estimates from `benchmarks/wasm_analysis.md`, not a fresh side-by-side rerun in this repo.
 
 ### Current measured package
 
@@ -55,27 +55,29 @@ Current `turboquant-wasm` bundle numbers below come from the latest measured sna
       <td><code>63,943 bytes</code> (<code>62.4 KiB</code>)</td>
     </tr>
     <tr>
-      <td><code>turboquant_wasm.js</code></td>
-      <td><code>21,768 bytes</code> (<code>21.3 KiB</code>)</td>
+      <td><code>turboquant_wasm.js</code> + <code>turboquant_wasm_bg.js</code></td>
+      <td><code>18,491 bytes</code> (<code>18.1 KiB</code>)</td>
     </tr>
     <tr>
       <td><strong>Total raw</strong></td>
-      <td><strong><code>85,711 bytes</code> (<code>83.7 KiB</code>)</strong></td>
+      <td><strong><code>82,434 bytes</code> (<code>80.5 KiB</code>)</strong></td>
     </tr>
     <tr>
       <td><strong><code>.wasm</code> gzip</strong></td>
-      <td><strong><code>27,372 bytes</code> (<code>26.7 KiB</code>)</strong></td>
+      <td><strong><code>27,279 bytes</code> (<code>26.6 KiB</code>)</strong></td>
     </tr>
     <tr>
       <td><strong><code>js</code> gzip</strong></td>
-      <td><strong><code>4,466 bytes</code> (<code>4.4 KiB</code>)</strong></td>
+      <td><strong><code>3,758 bytes</code> (<code>3.7 KiB</code>)</strong></td>
     </tr>
     <tr>
       <td><strong>Total gzip</strong></td>
-      <td><strong><code>31,838 bytes</code> (<code>31.1 KiB</code>)</strong></td>
+      <td><strong><code>31,037 bytes</code> (<code>30.3 KiB</code>)</strong></td>
     </tr>
   </tbody>
 </table>
+
+The npm browser entrypoint now ships the `wasm-pack --target bundler` output rather than the raw `web` loader. That keeps the published package free of a runtime `fetch()`-based Wasm bootstrap, which avoids the Socket alert on `pkg/turboquant_wasm.js` while still keeping the repo-local demos on the plain `web` target.
 
 ### Comparison with alternative browser-side vector search libraries
 
@@ -92,9 +94,9 @@ Current `turboquant-wasm` bundle numbers below come from the latest measured sna
   <tbody>
     <tr>
       <td><strong>turboquant-wasm</strong></td>
-      <td><strong><code>26.7 KiB</code></strong></td>
-      <td><strong><code>4.4 KiB</code></strong></td>
-      <td><strong><code>31.1 KiB</code></strong></td>
+      <td><strong><code>26.6 KiB</code></strong></td>
+      <td><strong><code>3.7 KiB</code></strong></td>
+      <td><strong><code>30.3 KiB</code></strong></td>
       <td>Quantization-first, no graph index</td>
     </tr>
     <tr>
@@ -152,7 +154,7 @@ This table keeps the product-level comparison from `benchmarks/wasm_analysis.md`
     </tr>
   </thead>
   <tbody>
-    <tr><td><strong>Bundle size (gzip)</strong></td><td><code>31.1 KiB</code></td><td><code>~215 KiB</code></td><td><code>~170 KiB</code></td><td><code>~325 KiB</code></td></tr>
+    <tr><td><strong>Bundle size (gzip)</strong></td><td><code>30.3 KiB</code></td><td><code>~215 KiB</code></td><td><code>~170 KiB</code></td><td><code>~325 KiB</code></td></tr>
     <tr><td><strong>Training needed</strong></td><td>No</td><td>No, but graph build required</td><td>No, but graph build required</td><td>No, but graph build required</td></tr>
     <tr><td><strong>Quantization</strong></td><td><code>1-8</code> bit scalar, paper-backed</td><td><code>8-bit</code> scalar</td><td>None</td><td>None</td></tr>
     <tr><td><strong>Search algorithm</strong></td><td>Brute-force scan in rotated domain</td><td>HNSW graph</td><td>HNSW graph</td><td>HNSW graph</td></tr>
@@ -178,7 +180,7 @@ This table keeps the product-level comparison from `benchmarks/wasm_analysis.md`
     </tr>
   </thead>
   <tbody>
-    <tr><td><strong>Bundle size</strong></td><td>About <code>5.5x</code> to <code>10.5x</code> smaller than graph-based WASM alternatives in the comparison tables, while still smaller than <code>vectra</code> in total shipped bytes</td></tr>
+    <tr><td><strong>Bundle size</strong></td><td>About <code>5.6x</code> to <code>10.7x</code> smaller than graph-based WASM alternatives in the comparison tables, while still smaller than <code>vectra</code> in total shipped bytes</td></tr>
     <tr><td><strong>Memory per vector</strong></td><td>About <code>8x</code> lower than raw float32 storage at packed <code>4-bit</code>, which matters directly in browser and edge memory budgets</td></tr>
     <tr><td><strong>API simplicity</strong></td><td>Build and search without graph parameters, <code>ef</code> tuning, connectivity tuning, or external quantization passes</td></tr>
     <tr><td><strong>Theoretical foundation</strong></td><td>Based on the TurboQuant paper rather than a purely heuristic compression layer</td></tr>
@@ -207,6 +209,8 @@ This table keeps the product-level comparison from `benchmarks/wasm_analysis.md`
 ```bash
 npm install @zlaabsi/turboquant-wasm
 ```
+
+For npm consumers, the browser entrypoint is packaged with the `wasm-pack` bundler target. The repo-local `examples/` continue to use the raw `web` target in `pkg/`.
 
 ## Quick start
 
@@ -321,7 +325,7 @@ That means the numbers below are **directional evidence**, not a universal SLA.
     <tr><td><code>d=384</code>, <code>4-bit</code>, <code>N=5000</code></td><td><code>82.4%</code> recall@10, <code>11.89 ms</code> median search in the clustered-query sweep, <code>196 B/vector</code></td></tr>
     <tr><td><code>d=768</code>, <code>4-bit</code>, <code>N=3000</code></td><td><code>81.5%</code> recall@10, <code>10.37 ms</code> median search, <code>388 B/vector</code></td></tr>
     <tr><td>Sustained load at <code>N=5000</code></td><td><code>7.87 ms</code> p50, <code>10.07 ms</code> p95, <code>23.13 ms</code> p99, <code>112 q/s</code></td></tr>
-    <tr><td>Web package size</td><td><code>83.7 KiB</code> raw, <code>31.1 KiB</code> gzip</td></tr>
+    <tr><td>Web package size</td><td><code>80.5 KiB</code> raw, <code>30.3 KiB</code> gzip</td></tr>
   </tbody>
 </table>
 
@@ -356,12 +360,13 @@ That means the numbers below are **directional evidence**, not a universal SLA.
 </p>
 
 <p align="center">
-  <em>Raw and gzip package sizes for the current generated web package.</em>
+  <em>Raw and gzip sizes for the current npm browser package built from the bundler-target output.</em>
 </p>
 
 ### Raw benchmark data
 
-- Snapshot JSON: [benchmarks/results/2026-04-08-m1-max-node22.json](benchmarks/results/2026-04-08-m1-max-node22.json)
+- Packaging note: the `2026-04-09` snapshot refreshes bundle-size fields for the current npm browser package, while the raw search log remains the `2026-04-08` run.
+- Snapshot JSON: [benchmarks/results/2026-04-09-m1-max-node22.json](benchmarks/results/2026-04-09-m1-max-node22.json)
 - Raw console log: [benchmarks/results/2026-04-08-m1-max-node22-realworld.txt](benchmarks/results/2026-04-08-m1-max-node22-realworld.txt)
 - Chart generator: [benchmarks/render_charts.js](benchmarks/render_charts.js)
 

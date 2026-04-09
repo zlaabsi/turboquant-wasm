@@ -210,7 +210,7 @@ function main() {
     path.join(outputDir, 'bundle-size.svg'),
     barChartSvg({
       title: 'Bundle size',
-      subtitle: 'Measured on the generated web package with gzip -9',
+      subtitle: 'Measured on the current npm browser package with gzip -9',
       yLabel: 'Size (KiB)',
       color: '#b45309',
       data: [

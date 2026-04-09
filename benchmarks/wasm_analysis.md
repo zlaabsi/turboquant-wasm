@@ -1,11 +1,11 @@
 # turboquant-wasm: Benchmark & Comparative Analysis
 
 > Status: maintained analysis for the current repository.
-> TurboQuant rows in this document are refreshed from `benchmarks/results/2026-04-08-m1-max-node22.json`.
+> TurboQuant rows in this document are refreshed from `benchmarks/results/2026-04-09-m1-max-node22.json`.
 > Competitor rows remain estimate-based comparison points for positioning. They are useful for tradeoff discussion, not a fresh side-by-side rerun in this repo.
 
 **Last refreshed:** 2026-04-09  
-**Current TurboQuant snapshot:** 2026-04-08 — Apple M1 Max, Node v22.11.0, npm 10.9.0, Darwin 25.3.0 arm64  
+**Current TurboQuant snapshot:** 2026-04-09 refresh of the 2026-04-08 M1 Max run — Apple M1 Max, Node v22.11.0, npm 10.9.0, Darwin 25.3.0 arm64  
 **Paper:** arXiv:2504.19874 — "TurboQuant: Online Vector Quantization with Near-optimal Distortion Rate"
 
 ---
@@ -19,11 +19,11 @@ These numbers come directly from the current benchmark snapshot and match the va
 | File | Size |
 |---|---|
 | `turboquant_wasm_bg.wasm` | `63,943 bytes` (`62.4 KiB`) |
-| `turboquant_wasm.js` | `21,768 bytes` (`21.3 KiB`) |
-| **Total raw** | **`85,711 bytes` (`83.7 KiB`)** |
-| **`.wasm` gzip** | **`27,372 bytes` (`26.7 KiB`)** |
-| **`js` gzip** | **`4,466 bytes` (`4.4 KiB`)** |
-| **Total gzip** | **`31,838 bytes` (`31.1 KiB`)** |
+| `turboquant_wasm.js` + `turboquant_wasm_bg.js` | `18,491 bytes` (`18.1 KiB`) |
+| **Total raw** | **`82,434 bytes` (`80.5 KiB`)** |
+| **`.wasm` gzip** | **`27,279 bytes` (`26.6 KiB`)** |
+| **`js` gzip** | **`3,758 bytes` (`3.7 KiB`)** |
+| **Total gzip** | **`31,037 bytes` (`30.3 KiB`)** |
 
 ### Comparison with alternative browser-side vector search libraries
 
@@ -31,7 +31,7 @@ TurboQuant values below are current measured numbers. Alternative-library rows a
 
 | Library | `.wasm` gzip | JS glue gzip | Total gzip | Notes |
 |---|---|---|---|---|
-| **turboquant-wasm** | **`26.7 KiB`** | **`4.4 KiB`** | **`31.1 KiB`** | Quantization-first, no graph index |
+| **turboquant-wasm** | **`26.6 KiB`** | **`3.7 KiB`** | **`30.3 KiB`** | Quantization-first, no graph index |
 | usearch-wasm | `~200 KiB` | `~15 KiB` | `~215 KiB` | HNSW + SIMD |
 | Voy | `~150 KiB` | `~20 KiB` | `~170 KiB` | Rust HNSW |
 | hnswlib-wasm | `~300 KiB` | `~25 KiB` | `~325 KiB` | C++ via Emscripten |
@@ -39,10 +39,10 @@ TurboQuant values below are current measured numbers. Alternative-library rows a
 
 Current positioning takeaway:
 
-- `turboquant-wasm` is about `6.9x` smaller than `usearch-wasm`.
-- `turboquant-wasm` is about `5.5x` smaller than `Voy`.
-- `turboquant-wasm` is about `10.5x` smaller than `hnswlib-wasm`.
-- `turboquant-wasm` is still about `1.6x` smaller than `vectra` in total shipped bytes.
+- `turboquant-wasm` is about `7.1x` smaller than `usearch-wasm`.
+- `turboquant-wasm` is about `5.6x` smaller than `Voy`.
+- `turboquant-wasm` is about `10.7x` smaller than `hnswlib-wasm`.
+- `turboquant-wasm` is still about `1.7x` smaller than `vectra` in total shipped bytes.
 
 This size profile is the main differentiator for:
 
@@ -56,6 +56,7 @@ This size profile is the main differentiator for:
 - No external native dependency stack, BLAS, or LAPACK.
 - A small core: PRNG, orthogonalization, centroid tables, scalar quantization, packed storage, and compressed brute-force scan.
 - Size-oriented release settings in `Cargo.toml`, plus an implementation that matches the TurboQuant algorithm instead of wrapping a larger ANN engine.
+- The published npm browser entrypoint uses the `wasm-pack` bundler target, so the package does not ship a runtime `fetch()`-based Wasm loader.
 
 ---
 
@@ -65,7 +66,7 @@ The table below keeps the product-level comparison that matters for repo visitor
 
 | Feature | turboquant-wasm | usearch-wasm | Voy | hnswlib-wasm |
 |---|---|---|---|---|
-| **Bundle size (gzip)** | `31.1 KiB` | `~215 KiB` | `~170 KiB` | `~325 KiB` |
+| **Bundle size (gzip)** | `30.3 KiB` | `~215 KiB` | `~170 KiB` | `~325 KiB` |
 | **Training needed** | No | No, but graph build required | No, but graph build required | No, but graph build required |
 | **Quantization** | `1-8` bit scalar, paper-backed | `8-bit` scalar | None | None |
 | **Search algorithm** | Brute-force scan in rotated domain | HNSW graph | HNSW graph | HNSW graph |
@@ -114,7 +115,7 @@ This is the current local evidence committed in the repo.
 | `d=384`, `4-bit`, `N=10000` | `78.5%` recall@10, `16.09 ms` search |
 | `d=768`, `4-bit`, `N=3000` | `81.5%` recall@10, `10.37 ms` median search, `388 B/vector` |
 | Sustained load at `N=5000` | `7.87 ms` p50, `10.07 ms` p95, `23.13 ms` p99, `112 q/s` |
-| Web package size | `83.7 KiB` raw, `31.1 KiB` gzip |
+| Web package size | `80.5 KiB` raw, `30.3 KiB` gzip |
 
 ### Important limits on this snapshot
 
@@ -172,7 +173,7 @@ If by "scores" you meant recall rather than latency, the March document did not 
 
 | Dimension | turboquant-wasm advantage |
 |---|---|
-| **Bundle size** | About `5.5x` to `10.5x` smaller than graph-based WASM alternatives in the maintained comparison table, while still smaller than `vectra` in total shipped bytes |
+| **Bundle size** | About `5.6x` to `10.7x` smaller than graph-based WASM alternatives in the maintained comparison table, while still smaller than `vectra` in total shipped bytes |
 | **Memory per vector** | About `8x` lower than raw float32 storage at packed `4-bit`, which directly helps browser and edge memory budgets |
 | **API simplicity** | Build and search without graph parameters, `ef` tuning, connectivity tuning, or separate quantization passes |
 | **Theoretical foundation** | Based on the TurboQuant paper rather than a purely heuristic compression layer |
@@ -205,7 +206,7 @@ npm run bench:charts
 
 Artifacts:
 
-- measured snapshot: `benchmarks/results/2026-04-08-m1-max-node22.json`
+- measured snapshot: `benchmarks/results/2026-04-09-m1-max-node22.json`
 - raw log: `benchmarks/results/2026-04-08-m1-max-node22-realworld.txt`
 - comparison data for charts: `benchmarks/results/analysis-derived-comparison.json`
 - generated charts: `benchmarks/charts/*.svg`

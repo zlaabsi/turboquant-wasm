@@ -24,11 +24,11 @@
  * ```
  */
 
-import init, {
+import {
   TurboQuantizer as WasmQuantizer,
   CompressedIndex as WasmIndex,
   build_index,
-} from '../pkg/turboquant_wasm.js';
+} from '../pkg-bundler/turboquant_wasm.js';
 
 export interface QuantizerOptions {
   /** Embedding dimension (e.g. 384, 768, 1536) */
@@ -208,8 +208,6 @@ export class Index {
  * @param options - Quantizer configuration (dim, bits, seed)
  */
 export async function createQuantizer(options: QuantizerOptions): Promise<Quantizer> {
-  await init();
-
   const bits = options.bits ?? 4;
   const seed = options.seed ?? 42n;
 

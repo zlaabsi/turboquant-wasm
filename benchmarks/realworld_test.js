@@ -139,12 +139,19 @@ function formatBytes(bytes) {
 }
 
 function measureBundleSizes() {
-  const wasmPath = path.join(__dirname, '..', 'pkg', 'turboquant_wasm_bg.wasm');
-  const jsPath = path.join(__dirname, '..', 'pkg', 'turboquant_wasm.js');
+  const packageDir = path.join(__dirname, '..', 'pkg-bundler');
+  const wasmPath = path.join(packageDir, 'turboquant_wasm_bg.wasm');
+  const jsPaths = [
+    path.join(packageDir, 'turboquant_wasm.js'),
+    path.join(packageDir, 'turboquant_wasm_bg.js'),
+  ];
   const wasmRaw = fs.statSync(wasmPath).size;
-  const jsRaw = fs.statSync(jsPath).size;
+  const jsRaw = jsPaths.reduce((total, filePath) => total + fs.statSync(filePath).size, 0);
   const wasmGzip = zlib.gzipSync(fs.readFileSync(wasmPath), { level: 9 }).length;
-  const jsGzip = zlib.gzipSync(fs.readFileSync(jsPath), { level: 9 }).length;
+  const jsGzip = jsPaths.reduce(
+    (total, filePath) => total + zlib.gzipSync(fs.readFileSync(filePath), { level: 9 }).length,
+    0
+  );
 
   return {
     totalRaw: wasmRaw + jsRaw,
