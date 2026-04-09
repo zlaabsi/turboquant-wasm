@@ -7,6 +7,24 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/zlaabsi/turboquant-wasm/actions/workflows/ci.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/zlaabsi/turboquant-wasm/ci.yml?branch=main&label=CI&style=flat-square" alt="CI status">
+  </a>
+  <a href="https://www.npmjs.com/package/@zlaabsi/turboquant-wasm">
+    <img src="https://img.shields.io/npm/v/%40zlaabsi%2Fturboquant-wasm?style=flat-square" alt="npm version">
+  </a>
+  <a href="https://www.npmjs.com/package/@zlaabsi/turboquant-wasm">
+    <img src="https://img.shields.io/npm/dm/%40zlaabsi%2Fturboquant-wasm?style=flat-square" alt="npm downloads per month">
+  </a>
+  <a href="LICENSE">
+    <img src="https://img.shields.io/badge/license-Apache--2.0-4b5563?style=flat-square" alt="Apache-2.0 license">
+  </a>
+  <a href="https://arxiv.org/abs/2504.19874">
+    <img src="https://img.shields.io/badge/paper-arXiv%3A2504.19874-b31b1b?style=flat-square" alt="TurboQuant paper on arXiv">
+  </a>
+</p>
+
+<p align="center">
   <img src="benchmarks/charts/bundle-size-vs-alternatives.svg" alt="Bundle size vs alternative browser-side search libraries" width="860">
 </p>
 
