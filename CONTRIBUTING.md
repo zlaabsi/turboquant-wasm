@@ -49,7 +49,7 @@ Examples:
 ## Release Flow
 
 The repository release tag is `v<version>`, for example `v0.1.0`.
-The npm package is published as `@zlaabsi/turboquant-wasm`.
+The package is published as `@zlaabsi/turboquant-wasm` on npmjs and mirrored to GitHub Packages.
 
 Normal release flow:
 
@@ -58,7 +58,7 @@ Normal release flow:
 3. Push the release commit to `main`.
 4. Create and push the matching git tag.
 
-The release workflow validates the tag, runs checks, attaches the tarball to the GitHub Release, and publishes to npm through npm trusted publishing from GitHub Actions. No `NPM_TOKEN` repository secret is required.
+The release workflow validates the tag, runs checks, attaches the tarball to the GitHub Release, publishes to npm through npm trusted publishing from GitHub Actions, then publishes the same tarball to GitHub Packages with the repository `GITHUB_TOKEN`. No `NPM_TOKEN` repository secret is required.
 
 Before the first automated publish, configure the npm package to trust this repository and workflow:
 
@@ -67,6 +67,8 @@ Before the first automated publish, configure the npm package to trust this repo
 3. Use repository `zlaabsi/turboquant-wasm` and workflow filename `release.yml`.
 
 After that one-time setup, pushing `v<version>` is enough to publish.
+
+After the first GitHub Packages publish, check the package visibility in GitHub if you want the package page visible outside maintainers. GitHub Packages npm packages start private by default, even when linked to a repository.
 
 ## Pull Request Expectations
 
