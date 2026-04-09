@@ -13,8 +13,8 @@
   <a href="https://www.npmjs.com/package/@zlaabsi/turboquant-wasm">
     <img src="https://img.shields.io/npm/v/%40zlaabsi%2Fturboquant-wasm?style=flat-square" alt="npm version">
   </a>
-  <a href="https://www.npmjs.com/package/@zlaabsi/turboquant-wasm">
-    <img src="https://img.shields.io/npm/dm/%40zlaabsi%2Fturboquant-wasm?style=flat-square" alt="npm downloads per month">
+  <a href="https://twitter.com/ZakShark">
+    <img src="https://img.shields.io/twitter/follow/ZakShark?style=social" alt="X follow">
   </a>
   <a href="LICENSE">
     <img src="https://img.shields.io/badge/license-Apache--2.0-4b5563?style=flat-square" alt="Apache-2.0 license">

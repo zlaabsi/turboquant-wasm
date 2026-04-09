@@ -60,6 +60,8 @@ Normal release flow:
 
 The release workflow validates the tag, runs checks, attaches the tarball to the GitHub Release, publishes to npm through npm trusted publishing from GitHub Actions, then publishes the same tarball to GitHub Packages with the repository `GITHUB_TOKEN`. No `NPM_TOKEN` repository secret is required.
 
+If a version already exists on npm but has not been mirrored to GitHub Packages yet, run the `Sync GitHub Packages` workflow from `main`. It republishes the current tarball to `npm.pkg.github.com` without touching npmjs.
+
 Before the first automated publish, configure the npm package to trust this repository and workflow:
 
 1. Open the npm package settings for `@zlaabsi/turboquant-wasm`.
