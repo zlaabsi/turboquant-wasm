@@ -20,8 +20,11 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 24
           registry-url: https://registry.npmjs.org
+
+      - name: Ensure npm trusted publishing support
+        run: npm install -g npm@^11.5.1
 
       - name: Setup Rust
         run: |
@@ -61,11 +64,4 @@ jobs:
           fi
 
       - name: Publish to npm
-        run: |
-          if [ -z "${NODE_AUTH_TOKEN:-}" ]; then
-            echo "NPM_TOKEN is not configured. Skipping npm publish."
-            exit 0
-          fi
-          npm publish ./*.tgz --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish ./*.tgz --access public

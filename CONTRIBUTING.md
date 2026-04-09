@@ -58,7 +58,15 @@ Normal release flow:
 3. Push the release commit to `main`.
 4. Create and push the matching git tag.
 
-The release workflow will validate the tag, run checks, attach the tarball to the GitHub Release, and publish to npm when the `NPM_TOKEN` repository secret is present. It also supports manual dispatch from the GitHub Actions UI for rerunning a release.
+The release workflow validates the tag, runs checks, attaches the tarball to the GitHub Release, and publishes to npm through npm trusted publishing from GitHub Actions. No `NPM_TOKEN` repository secret is required.
+
+Before the first automated publish, configure the npm package to trust this repository and workflow:
+
+1. Open the npm package settings for `@zlaabsi/turboquant-wasm`.
+2. Add a trusted publisher for GitHub Actions.
+3. Use repository `zlaabsi/turboquant-wasm` and workflow filename `release.yml`.
+
+After that one-time setup, pushing `v<version>` is enough to publish.
 
 ## Pull Request Expectations
 
