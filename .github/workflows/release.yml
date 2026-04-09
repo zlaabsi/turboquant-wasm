@@ -27,8 +27,10 @@ jobs:
       - name: Resolve package metadata
         id: pkg
         run: |
-          echo "name=$(node -p 'require(\"./package.json\").name')" >> "$GITHUB_OUTPUT"
-          echo "version=$(node -p 'require(\"./package.json\").version')" >> "$GITHUB_OUTPUT"
+          PKG_NAME=$(node -p "require('./package.json').name" | tr -d '\n')
+          PKG_VERSION=$(node -p "require('./package.json').version" | tr -d '\n')
+          echo "name=${PKG_NAME}" >> "$GITHUB_OUTPUT"
+          echo "version=${PKG_VERSION}" >> "$GITHUB_OUTPUT"
 
       - name: Ensure npm trusted publishing support
         run: npm install -g npm@^11.5.1
