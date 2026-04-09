@@ -24,6 +24,12 @@ jobs:
           node-version: 24
           registry-url: https://registry.npmjs.org
 
+      - name: Resolve package metadata
+        id: pkg
+        run: |
+          echo "name=$(node -p 'require(\"./package.json\").name')" >> "$GITHUB_OUTPUT"
+          echo "version=$(node -p 'require(\"./package.json\").version')" >> "$GITHUB_OUTPUT"
+
       - name: Ensure npm trusted publishing support
         run: npm install -g npm@^11.5.1
 
@@ -64,8 +70,22 @@ jobs:
             gh release create "${GITHUB_REF_NAME}" ./*.tgz --generate-notes --title "${GITHUB_REF_NAME}"
           fi
 
+      - name: Check npm publish state
+        id: npm_state
+        run: |
+          if npm view "${{ steps.pkg.outputs.name }}@${{ steps.pkg.outputs.version }}" version --json >/dev/null 2>&1; then
+            echo "already_published=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "already_published=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Publish to npm
+        if: steps.npm_state.outputs.already_published != 'true'
         run: npm publish ./*.tgz --access public
+
+      - name: Skip npm publish when version already exists
+        if: steps.npm_state.outputs.already_published == 'true'
+        run: echo "npm already has ${{ steps.pkg.outputs.name }}@${{ steps.pkg.outputs.version }}; skipping publish."
 
       - name: Setup Node.js for GitHub Packages
         uses: actions/setup-node@v6
@@ -74,7 +94,23 @@ jobs:
           registry-url: https://npm.pkg.github.com
           scope: "@zlaabsi"
 
+      - name: Check GitHub Packages publish state
+        id: ghpkg_state
+        run: |
+          if npm view "${{ steps.pkg.outputs.name }}@${{ steps.pkg.outputs.version }}" version --registry=https://npm.pkg.github.com --json >/dev/null 2>&1; then
+            echo "already_published=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "already_published=false" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ github.token }}
+
       - name: Publish to GitHub Packages
+        if: steps.ghpkg_state.outputs.already_published != 'true'
         run: npm publish ./*.tgz --registry=https://npm.pkg.github.com
         env:
           NODE_AUTH_TOKEN: ${{ github.token }}
+
+      - name: Skip GitHub Packages publish when version already exists
+        if: steps.ghpkg_state.outputs.already_published == 'true'
+        run: echo "GitHub Packages already has ${{ steps.pkg.outputs.name }}@${{ steps.pkg.outputs.version }}; skipping publish."
